@@ -1,13 +1,19 @@
-//
-//  .gitignore
-//  freewrite
-//
-//  Created by thorfinn on 4/5/25.
-//
+# XcodeGen - we generate project files
+*.xcodeproj
+*.xcworkspace
+.xcodegen/
+
+# Build artifacts
+DerivedData/
+.build/
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
 
 # Xcode
 build/
-DerivedData/
+xcuserdata/
 *.pbxuser
 !default.pbxuser
 *.mode1v3
@@ -16,13 +22,11 @@ DerivedData/
 !default.mode2v3
 *.perspectivev3
 !default.perspectivev3
-xcuserdata/
 *.xccheckout
 *.moved-aside
 *.xcuserstate
 
 # Swift Package Manager
-.build/
 Packages/
 Package.pins
 Package.resolved
@@ -52,6 +56,11 @@ fastlane/test_output
 timeline.xctimeline
 playground.xcworkspace
 
+# Testing
+TestResults/
+*.gcov
+*.profdata
+
 # App data
 *.sqlite
 *.sqlite-shm
@@ -61,6 +70,11 @@ playground.xcworkspace
 .DS_Store
 .AppleDouble
 .LSOverride
+
+# IDE
+*.swp
+*.swo
+*~
 
 # Icon?
 Icon?
