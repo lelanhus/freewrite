@@ -16,6 +16,7 @@ struct ContentView: View {
     @State private var uiState = UIStateManager()
     @State private var hoverState = HoverStateManager()
     @State private var typographyState = TypographyStateManager()
+    @State private var progressState = ProgressStateManager()
     @State private var timerCancellable: AnyCancellable?
     @State private var fullscreenCancellables = Set<AnyCancellable>()
     
@@ -89,6 +90,20 @@ struct ContentView: View {
                     }
                 })
                 .padding(.bottom, uiState.viewHeight > 0 ? uiState.viewHeight / 4 : 0)
+                
+                // Progress indicator overlay
+                if progressState.isVisible {
+                    VStack(spacing: 12) {
+                        ProgressView(value: progressState.progress)
+                            .frame(width: 200)
+                        Text(progressState.loadingMessage)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    .padding()
+                    .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 8))
+                    .shadow(radius: 4)
+                }
                 
                 VStack {
                     Spacer()
@@ -246,20 +261,36 @@ struct ContentView: View {
     }
     
     private func loadInitialEntry() async {
+        // Show progress for initial loading which can take time
+        progressState.startLoading("Loading your writing entries...")
+        
         do {
+            // Update progress during loading
+            progressState.updateProgress(0.3, message: "Scanning entry files...")
             entries = try await fileService.loadAllEntries()
+            
+            progressState.updateProgress(0.7, message: "Loading most recent entry...")
             
             if let mostRecent = entries.first {
                 selectedEntryId = mostRecent.id
                 let content = try await fileService.loadEntry(mostRecent.id)
                 text = content
+                progressState.updateProgress(1.0, message: "Ready to write!")
             } else {
                 // No entries exist, create first entry
+                progressState.updateProgress(0.9, message: "Creating your first entry...")
                 await createNewEntry()
             }
+            
+            // Small delay to show completion, then hide
+            try? await Task.sleep(nanoseconds: 300_000_000) // 0.3 seconds
+            progressState.finishLoading()
+            
         } catch {
             print("Failed to load initial entry: \(error)")
+            progressState.updateProgress(0.8, message: "Creating new entry...")
             await createNewEntry()
+            progressState.finishLoading()
         }
     }
     

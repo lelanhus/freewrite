@@ -88,4 +88,37 @@ final class TypographyStateManager {
     }
 }
 
+// MARK: - Progress State Manager
+
+@Observable
+@MainActor
+final class ProgressStateManager {
+    private(set) var isLoading = false
+    private(set) var loadingMessage = ""
+    private(set) var progress: Double = 0.0
+    
+    func startLoading(_ message: String) {
+        loadingMessage = message
+        progress = 0.0
+        isLoading = true
+    }
+    
+    func updateProgress(_ value: Double, message: String? = nil) {
+        progress = min(max(value, 0.0), 1.0) // Clamp between 0 and 1
+        if let message = message {
+            loadingMessage = message
+        }
+    }
+    
+    func finishLoading() {
+        isLoading = false
+        loadingMessage = ""
+        progress = 0.0
+    }
+    
+    var isVisible: Bool {
+        return isLoading
+    }
+}
+
 // Note: getLineHeight function is defined in Extensions/ContentView+Extensions.swift
