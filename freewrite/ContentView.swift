@@ -193,6 +193,12 @@ struct ContentView: View {
                         await saveCurrentText()
                     }
                 )
+                .onAppear {
+                    // Load entries when sidebar first appears
+                    Task {
+                        await loadAllEntries()
+                    }
+                }
             }
         }
         .frame(minWidth: 1100, minHeight: 600)
@@ -350,6 +356,15 @@ struct ContentView: View {
                 error: error,
                 retry: { Task { await self.deleteEntry(entry) } }
             ))
+        }
+    }
+    
+    private func loadAllEntries() async {
+        do {
+            entries = try await fileService.loadAllEntries()
+        } catch {
+            print("Failed to load entries: \(error)")
+            entries = []
         }
     }
     
