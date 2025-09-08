@@ -76,4 +76,18 @@ final class AIIntegrationService: AIIntegrationServiceProtocol {
         NSWorkspace.shared.open(url)
         print("Opened URL: \(url.absoluteString)")
     }
+    
+    func openChatGPT(with content: String) async throws {
+        let url = try generateChatGPTURL(content: content)
+        openURL(url)
+    }
+    
+    func openClaude(with content: String) async throws {
+        let url = try generateClaudeURL(content: content)
+        openURL(url)
+    }
+    
+    func copyPromptToClipboard(with content: String) {
+        copyPromptToClipboard(content: content)
+    }
 }

@@ -39,6 +39,18 @@ protocol AIIntegrationServiceProtocol: Sendable {
     /// Opens a URL in the default browser
     /// - Parameter url: The URL to open
     func openURL(_ url: URL)
+    
+    /// Convenience method to open ChatGPT with content
+    /// - Parameter content: The text content to share
+    func openChatGPT(with content: String) async throws
+    
+    /// Convenience method to open Claude with content
+    /// - Parameter content: The text content to share
+    func openClaude(with content: String) async throws
+    
+    /// Convenience method to copy prompt to clipboard
+    /// - Parameter content: The text content to include
+    func copyPromptToClipboard(with content: String)
 }
 
 // MARK: - AI Provider

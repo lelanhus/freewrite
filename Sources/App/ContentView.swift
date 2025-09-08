@@ -19,9 +19,15 @@ struct ContentView: View {
     @State private var isHoveringClock = false
     @State private var hoveredFont: String? = nil
     @State private var isHoveringSize = false
+    @State private var isHoveringFonts = false
     @State private var isHoveringNewEntry = false
     @State private var isHoveringChat = false
     @State private var viewHeight: CGFloat = 0
+    @State private var showingChatMenu = false
+    @State private var didCopyPrompt: Bool = false
+    @State private var entries: [WritingEntryDTO] = []
+    @State private var selectedEntryId: UUID? = nil
+    @State private var hoveredEntryId: UUID? = nil
     
     let placeholderOptions = [
         "\n\nBegin writing",
@@ -142,6 +148,22 @@ struct ContentView: View {
                                     NSCursor.pointingHand.push()
                                 } else {
                                     NSCursor.pop()
+                                }
+                            }
+                            .onAppear {
+                                // Add scroll wheel event monitoring for font size adjustment
+                                NSEvent.addLocalMonitorForEvents(matching: .scrollWheel) { event in
+                                    if isHoveringSize {
+                                        let fontSizes: [CGFloat] = [16, 18, 20, 22, 24, 26]
+                                        let direction = event.deltaY > 0 ? -1 : 1 // Scroll up decreases, scroll down increases
+                                        
+                                        if let currentIndex = fontSizes.firstIndex(of: fontSize) {
+                                            let newIndex = max(0, min(fontSizes.count - 1, currentIndex + direction))
+                                            fontSize = fontSizes[newIndex]
+                                            NSHapticFeedbackManager.defaultPerformer.perform(.generic, performanceTime: .now)
+                                        }
+                                    }
+                                    return event
                                 }
                             }
                             
@@ -285,7 +307,8 @@ struct ContentView: View {
                             
                             if canUseChat {
                                 Button("Chat") {
-                                    // TODO: Implement chat integration
+                                    showingChatMenu = true
+                                    didCopyPrompt = false
                                 }
                                 .buttonStyle(.plain)
                                 .foregroundColor(isHoveringChat ? textHoverColor : textColor)
@@ -296,6 +319,69 @@ struct ContentView: View {
                                         NSCursor.pointingHand.push()
                                     } else {
                                         NSCursor.pop()
+                                    }
+                                }
+                                .popover(isPresented: $showingChatMenu, attachmentAnchor: .point(UnitPoint(x: 0.5, y: 0)), arrowEdge: .top) {
+                                    VStack(spacing: 0) {
+                                        let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+                                        
+                                        if text.count < 350 {
+                                            Text("Please free write for at minimum 5 minutes first. Then click this. Trust.")
+                                                .font(.system(size: 14))
+                                                .foregroundColor(.primary)
+                                                .frame(width: 250)
+                                                .padding(.horizontal, 12)
+                                                .padding(.vertical, 8)
+                                        } else {
+                                            Button(action: {
+                                                showingChatMenu = false
+                                                openChatGPT()
+                                            }) {
+                                                Text("ChatGPT")
+                                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                                    .padding(.horizontal, 12)
+                                                    .padding(.vertical, 8)
+                                            }
+                                            .buttonStyle(.plain)
+                                            .foregroundColor(.primary)
+                                            
+                                            Divider()
+                                            
+                                            Button(action: {
+                                                showingChatMenu = false
+                                                openClaude()
+                                            }) {
+                                                Text("Claude")
+                                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                                    .padding(.horizontal, 12)
+                                                    .padding(.vertical, 8)
+                                            }
+                                            .buttonStyle(.plain)
+                                            .foregroundColor(.primary)
+                                            
+                                            Divider()
+                                            
+                                            Button(action: {
+                                                copyPromptToClipboard()
+                                                didCopyPrompt = true
+                                            }) {
+                                                Text(didCopyPrompt ? "Copied!" : "Copy Prompt")
+                                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                                    .padding(.horizontal, 12)
+                                                    .padding(.vertical, 8)
+                                            }
+                                            .buttonStyle(.plain)
+                                            .foregroundColor(.primary)
+                                        }
+                                    }
+                                    .frame(minWidth: 120, maxWidth: 250)
+                                    .background(Color(NSColor.controlBackgroundColor))
+                                    .cornerRadius(8)
+                                    .shadow(color: Color.black.opacity(0.1), radius: 4, y: 2)
+                                    .onChange(of: showingChatMenu) { newValue in
+                                        if !newValue {
+                                            didCopyPrompt = false
+                                        }
                                     }
                                 }
                                 
@@ -385,10 +471,105 @@ struct ContentView: View {
             
             // Right sidebar (hidden by default)
             if showingSidebar {
-                // TODO: Implement sidebar for history
-                VStack {
-                    Text("History")
-                    Spacer()
+                Divider()
+                
+                VStack(spacing: 0) {
+                    // Header
+                    Button(action: {
+                        NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: fileService.getDocumentsDirectory().path)
+                    }) {
+                        HStack {
+                            VStack(alignment: .leading, spacing: 4) {
+                                HStack(spacing: 4) {
+                                    Text("History")
+                                        .font(.system(size: 13))
+                                        .foregroundColor(.primary)
+                                    Image(systemName: "arrow.up.right")
+                                        .font(.system(size: 10))
+                                        .foregroundColor(.primary)
+                                }
+                                Text(fileService.getDocumentsDirectory().path)
+                                    .font(.system(size: 10))
+                                    .foregroundColor(.secondary)
+                                    .lineLimit(1)
+                            }
+                            Spacer()
+                        }
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 12)
+                    
+                    Divider()
+                    
+                    // Entries List
+                    ScrollView {
+                        LazyVStack(spacing: 0) {
+                            ForEach(entries) { entry in
+                                Button(action: {
+                                    if selectedEntryId != entry.id {
+                                        Task {
+                                            await saveCurrentText() // Save current before switching
+                                            await loadEntry(entry: entry)
+                                        }
+                                    }
+                                }) {
+                                    HStack(alignment: .top) {
+                                        VStack(alignment: .leading, spacing: 4) {
+                                            HStack {
+                                                Text(entry.filename) // Using filename as preview for now
+                                                    .font(.system(size: 13))
+                                                    .lineLimit(1)
+                                                    .foregroundColor(.primary)
+                                                
+                                                Spacer()
+                                                
+                                                // Export/Trash icons that appear on hover
+                                                if hoveredEntryId == entry.id {
+                                                    HStack(spacing: 8) {
+                                                        Button(action: {
+                                                            Task {
+                                                                await deleteEntry(entry: entry)
+                                                            }
+                                                        }) {
+                                                            Image(systemName: "trash")
+                                                                .font(.system(size: 11))
+                                                                .foregroundColor(.red)
+                                                        }
+                                                        .buttonStyle(.plain)
+                                                    }
+                                                }
+                                            }
+                                            
+                                            Text(entry.createdAt.formatted(date: .abbreviated, time: .omitted))
+                                                .font(.system(size: 12))
+                                                .foregroundColor(.secondary)
+                                        }
+                                    }
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.horizontal, 16)
+                                    .padding(.vertical, 8)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 4)
+                                            .fill(entry.id == selectedEntryId ? Color.gray.opacity(0.1) : 
+                                                  entry.id == hoveredEntryId ? Color.gray.opacity(0.05) : Color.clear)
+                                    )
+                                }
+                                .buttonStyle(.plain)
+                                .contentShape(Rectangle())
+                                .onHover { hovering in
+                                    withAnimation(.easeInOut(duration: 0.2)) {
+                                        hoveredEntryId = hovering ? entry.id : nil
+                                    }
+                                }
+                                
+                                if entry.id != entries.last?.id {
+                                    Divider()
+                                }
+                            }
+                        }
+                    }
+                    .scrollIndicators(.never)
                 }
                 .frame(width: 200)
                 .background(Color(colorScheme == .light ? .white : .black))
@@ -399,6 +580,18 @@ struct ContentView: View {
         .preferredColorScheme(colorScheme)
         .onAppear {
             setupInitialState()
+        }
+        .onReceive(Timer.publish(every: 1, on: .main, in: .common).autoconnect()) { _ in
+            // Handle timer updates - make bottom nav disappear when timer is running
+            if timerService.isRunning && !isHoveringBottomNav {
+                withAnimation(.easeIn(duration: 1.0)) {
+                    bottomNavOpacity = 0.0
+                }
+            } else if !timerService.isRunning {
+                withAnimation(.easeOut(duration: 0.2)) {
+                    bottomNavOpacity = 1.0
+                }
+            }
         }
     }
     
@@ -419,17 +612,117 @@ struct ContentView: View {
     }
     
     private func saveCurrentText() async {
-        // TODO: Implement with file service - save current text to active entry
+        // Auto-save current text using file service
+        do {
+            if let currentEntry = await getCurrentEntry() {
+                try await fileService.saveEntry(currentEntry.id, content: text)
+            }
+        } catch {
+            print("Auto-save failed: \(error)")
+        }
     }
     
     private func createNewEntry() async {
-        // TODO: Implement with file service - create new entry
-        placeholderText = placeholderOptions.randomElement() ?? "\n\nBegin writing"
-        text = FreewriteConstants.headerString
+        do {
+            let newEntry = try await fileService.createNewEntry()
+            entries.insert(newEntry, at: 0) // Add to beginning of list
+            selectedEntryId = newEntry.id
+            placeholderText = placeholderOptions.randomElement() ?? "\n\nBegin writing"
+            text = FreewriteConstants.headerString
+            
+            // Save the initial empty entry
+            try await fileService.saveEntry(newEntry.id, content: text)
+        } catch {
+            print("Failed to create new entry: \(error)")
+        }
     }
     
     private func loadInitialEntry() async {
-        // TODO: Implement with file service - load most recent or create first entry
+        do {
+            entries = try await fileService.loadAllEntries()
+            
+            if let mostRecent = entries.first {
+                selectedEntryId = mostRecent.id
+                let content = try await fileService.loadEntry(mostRecent.id)
+                text = content
+            } else {
+                // No entries exist, create first entry
+                await createNewEntry()
+            }
+        } catch {
+            print("Failed to load initial entry: \(error)")
+            await createNewEntry()
+        }
+    }
+    
+    private func loadEntry(entry: WritingEntryDTO) async {
+        do {
+            selectedEntryId = entry.id
+            let content = try await fileService.loadEntry(entry.id)
+            text = content
+        } catch {
+            print("Failed to load entry: \(error)")
+        }
+    }
+    
+    private func deleteEntry(entry: WritingEntryDTO) async {
+        do {
+            try await fileService.deleteEntry(entry.id)
+            entries.removeAll { $0.id == entry.id }
+            
+            // If the deleted entry was selected, select the first entry or create a new one
+            if selectedEntryId == entry.id {
+                if let firstEntry = entries.first {
+                    await loadEntry(entry: firstEntry)
+                } else {
+                    await createNewEntry()
+                }
+            }
+        } catch {
+            print("Failed to delete entry: \(error)")
+        }
+    }
+    
+    private func getCurrentEntry() async -> WritingEntryDTO? {
+        do {
+            let entries = try await fileService.loadAllEntries()
+            return entries.first // Most recent entry
+        } catch {
+            return nil
+        }
+    }
+    
+    private func openChatGPT() {
+        let aiService = DIContainer.shared.resolve(AIIntegrationServiceProtocol.self)
+        let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        Task {
+            do {
+                try await aiService.openChatGPT(with: trimmedText)
+            } catch {
+                print("Failed to open ChatGPT: \(error)")
+            }
+        }
+    }
+    
+    private func openClaude() {
+        let aiService = DIContainer.shared.resolve(AIIntegrationServiceProtocol.self)
+        let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        Task {
+            do {
+                try await aiService.openClaude(with: trimmedText)
+            } catch {
+                print("Failed to open Claude: \(error)")
+            }
+        }
+    }
+    
+    private func copyPromptToClipboard() {
+        let aiService = DIContainer.shared.resolve(AIIntegrationServiceProtocol.self)
+        let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        aiService.copyPromptToClipboard(with: trimmedText)
     }
 }
 

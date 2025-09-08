@@ -161,4 +161,7 @@ final class MockAIIntegrationService: @unchecked Sendable, AIIntegrationServiceP
     func createPromptForClipboard(content: String, prompt: String?) -> String { fatalError("Mock not implemented") }
     func copyPromptToClipboard(content: String, prompt: String?) { fatalError("Mock not implemented") }
     func openURL(_ url: URL) { fatalError("Mock not implemented") }
+    func openChatGPT(with content: String) async throws { fatalError("Mock not implemented") }
+    func openClaude(with content: String) async throws { fatalError("Mock not implemented") }
+    func copyPromptToClipboard(with content: String) { fatalError("Mock not implemented") }
 }
