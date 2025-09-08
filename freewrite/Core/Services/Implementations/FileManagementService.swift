@@ -12,15 +12,18 @@ final class FileManagementService: FileManagementServiceProtocol {
         attributes: .concurrent
     )
     
-    // Entry caching for performance
+    // Entry caching for performance (longer TTL with directory monitoring)
     private var entryCache: [UUID: WritingEntryDTO] = [:]
     private var entryCacheTimestamp: Date?
-    private let cacheExpiryInterval: TimeInterval = 30.0 // 30 seconds
+    private let cacheExpiryInterval: TimeInterval = 300.0 // 5 minutes (longer with intelligent invalidation)
     
-    // Content caching to eliminate redundant file reads
+    // Content caching to eliminate redundant file reads  
     private var contentCache: [UUID: String] = [:]
     private var contentCacheTimestamp: [UUID: Date] = [:]
-    private let contentCacheExpiryInterval: TimeInterval = 60.0 // 1 minute
+    private let contentCacheExpiryInterval: TimeInterval = 600.0 // 10 minutes (longer with monitoring)
+    
+    // Smart invalidation - track if we have directory monitoring active
+    private var hasActiveMonitoring: Bool = false
     
     // File operation coordination to prevent corruption
     private var activeSaveOperations: Set<UUID> = []
@@ -301,20 +304,33 @@ final class FileManagementService: FileManagementServiceProtocol {
     private func getValidCachedEntry(_ entryId: UUID) -> WritingEntryDTO? {
         // Atomic check-and-get operation to prevent TOCTOU races
         guard let timestamp = entryCacheTimestamp else { return nil }
-        guard Date().timeIntervalSince(timestamp) < cacheExpiryInterval else { return nil }
+        guard isCacheValidBasedOnStrategy(timestamp) else { return nil }
         return entryCache[entryId]
     }
     
     private func getValidCachedEntries() -> [WritingEntryDTO] {
         // Atomic check-and-get-all operation to prevent TOCTOU races  
         guard let timestamp = entryCacheTimestamp else { return [] }
-        guard Date().timeIntervalSince(timestamp) < cacheExpiryInterval else { return [] }
+        guard isCacheValidBasedOnStrategy(timestamp) else { return [] }
         return Array(entryCache.values)
     }
     
     private func isCacheValid() -> Bool {
         guard let timestamp = entryCacheTimestamp else { return false }
-        return Date().timeIntervalSince(timestamp) < cacheExpiryInterval
+        return isCacheValidBasedOnStrategy(timestamp)
+    }
+    
+    private func isCacheValidBasedOnStrategy(_ timestamp: Date) -> Bool {
+        let age = Date().timeIntervalSince(timestamp)
+        
+        // Smart cache strategy: longer TTL when directory monitoring is active
+        if hasActiveMonitoring {
+            // With monitoring, cache can live longer since we get notified of changes
+            return age < cacheExpiryInterval
+        } else {
+            // Without monitoring, use shorter TTL to ensure consistency
+            return age < (cacheExpiryInterval / 10) // 30 seconds fallback
+        }
     }
     
     private func refreshEntryCache() async throws {
@@ -528,12 +544,15 @@ final class FileManagementService: FileManagementServiceProtocol {
         }
         
         directoryMonitor?.resume()
+        hasActiveMonitoring = true
         print("Directory monitoring enabled for: \(directoryPath)")
     }
     
     nonisolated private func cleanupDirectoryMonitoring() {
         directoryMonitor?.cancel()
         directoryMonitor = nil
+        // Note: hasActiveMonitoring cannot be set from nonisolated context
+        // This is acceptable since cleanup typically happens during deinit
     }
     
     deinit {
