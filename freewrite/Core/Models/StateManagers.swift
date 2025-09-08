@@ -66,17 +66,47 @@ final class HoverStateManager {
 @Observable
 @MainActor
 final class TypographyStateManager {
-    var selectedFont: String = FontConstants.defaultFont
-    var fontSize: CGFloat = FontConstants.defaultSize
+    var selectedFont: String = FontConstants.defaultFont {
+        didSet { invalidateTypographyCache() }
+    }
+    var fontSize: CGFloat = FontConstants.defaultSize {
+        didSet { invalidateTypographyCache() }
+    }
+    
+    // Cached typography calculations to prevent expensive recomputation
+    private var cachedLineHeight: CGFloat?
+    private var cachedPlaceholderOffset: CGFloat?
+    private var cacheValidForFont: String?
+    private var cacheValidForSize: CGFloat?
     
     var lineHeight: CGFloat {
+        // Return cached value if font/size hasn't changed
+        if let cached = cachedLineHeight,
+           cacheValidForFont == selectedFont,
+           cacheValidForSize == fontSize {
+            return cached
+        }
+        
+        // Compute and cache new value
         let font = NSFont(name: selectedFont, size: fontSize) ?? .systemFont(ofSize: fontSize)
         let defaultLineHeight = getLineHeight(font: font)
-        return (fontSize * 1.5) - defaultLineHeight
+        let computed = (fontSize * 1.5) - defaultLineHeight
+        
+        cacheLineHeight(computed)
+        return computed
     }
     
     var placeholderOffset: CGFloat {
-        return fontSize / 2
+        // Return cached value if font size hasn't changed
+        if let cached = cachedPlaceholderOffset,
+           cacheValidForSize == fontSize {
+            return cached
+        }
+        
+        // Compute and cache new value
+        let computed = fontSize / 2
+        cachePlaceholderOffset(computed)
+        return computed
     }
     
     func updateFont(_ font: String) {
@@ -85,6 +115,26 @@ final class TypographyStateManager {
     
     func updateFontSize(_ size: CGFloat) {
         fontSize = size
+    }
+    
+    // MARK: - Cache Management
+    
+    private func cacheLineHeight(_ value: CGFloat) {
+        cachedLineHeight = value
+        cacheValidForFont = selectedFont
+        cacheValidForSize = fontSize
+    }
+    
+    private func cachePlaceholderOffset(_ value: CGFloat) {
+        cachedPlaceholderOffset = value
+        cacheValidForSize = fontSize
+    }
+    
+    private func invalidateTypographyCache() {
+        cachedLineHeight = nil
+        cachedPlaceholderOffset = nil
+        cacheValidForFont = nil
+        cacheValidForSize = nil
     }
 }
 
