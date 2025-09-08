@@ -17,6 +17,7 @@ struct ContentView: View {
     @State private var hoverState = HoverStateManager()
     @State private var typographyState = TypographyStateManager()
     @State private var progressState = ProgressStateManager()
+    @State private var errorManager = ErrorManager()
     @State private var timerCancellable: AnyCancellable?
     @State private var fullscreenCancellables = Set<AnyCancellable>()
     
@@ -103,6 +104,38 @@ struct ContentView: View {
                     .padding()
                     .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 8))
                     .shadow(radius: 4)
+                }
+                
+                // Error presentation overlay
+                if let error = errorManager.currentError {
+                    VStack(spacing: 12) {
+                        Text(error.title)
+                            .font(.headline)
+                            .foregroundColor(.primary)
+                        
+                        Text(error.message)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .multilineTextAlignment(.center)
+                        
+                        HStack(spacing: 12) {
+                            Button("Dismiss") {
+                                errorManager.clearError()
+                            }
+                            .buttonStyle(.bordered)
+                            
+                            if error.recoveryAction != nil {
+                                Button("Retry") {
+                                    errorManager.retryCurrentOperation()
+                                }
+                                .buttonStyle(.borderedProminent)
+                            }
+                        }
+                    }
+                    .padding()
+                    .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 8))
+                    .shadow(radius: 8)
+                    .frame(maxWidth: 300)
                 }
                 
                 VStack {
@@ -242,7 +275,12 @@ struct ContentView: View {
                 try await fileService.saveEntry(currentEntry.id, content: text)
             }
         } catch {
-            print("Auto-save failed: \(error)")
+            // Report auto-save failures to user - critical for data safety awareness
+            errorManager.reportError(UserError.fileOperationFailed(
+                operation: "auto-save text",
+                error: error,
+                retry: { Task { await self.saveCurrentText() } }
+            ))
         }
     }
     
@@ -256,7 +294,12 @@ struct ContentView: View {
             // Save the initial empty entry
             try await fileService.saveEntry(newEntry.id, content: text)
         } catch {
-            print("Failed to create new entry: \(error)")
+            // Report entry creation failures - important for user awareness
+            errorManager.reportError(UserError.fileOperationFailed(
+                operation: "create new entry",
+                error: error,
+                retry: { Task { await self.createNewEntry() } }
+            ))
         }
     }
     
@@ -287,10 +330,12 @@ struct ContentView: View {
             progressState.finishLoading()
             
         } catch {
-            print("Failed to load initial entry: \(error)")
-            progressState.updateProgress(0.8, message: "Creating new entry...")
-            await createNewEntry()
             progressState.finishLoading()
+            // Report initial loading failures with recovery option
+            errorManager.reportError(UserError.entryLoadingFailed(
+                error,
+                createNew: { Task { await self.createNewEntry() } }
+            ))
         }
     }
     
@@ -300,7 +345,12 @@ struct ContentView: View {
             let content = try await fileService.loadEntry(entry.id)
             text = content
         } catch {
-            print("Failed to load entry: \(error)")
+            // Report entry loading errors with retry option
+            errorManager.reportError(UserError.fileOperationFailed(
+                operation: "load entry",
+                error: error,
+                retry: { Task { await self.loadEntry(entry) } }
+            ))
         }
     }
     
@@ -318,7 +368,12 @@ struct ContentView: View {
                 }
             }
         } catch {
-            print("Failed to delete entry: \(error)")
+            // Report entry deletion errors - important for user awareness
+            errorManager.reportError(UserError.fileOperationFailed(
+                operation: "delete entry",
+                error: error,
+                retry: { Task { await self.deleteEntry(entry) } }
+            ))
         }
     }
     
@@ -340,7 +395,8 @@ struct ContentView: View {
             do {
                 try await aiService.openChatGPT(with: trimmedText)
             } catch {
-                print("Failed to open ChatGPT: \(error)")
+                // Report AI integration errors to user
+                errorManager.reportError(UserError.aiIntegrationError(error))
             }
         }
     }
@@ -352,7 +408,8 @@ struct ContentView: View {
             do {
                 try await aiService.openClaude(with: trimmedText)
             } catch {
-                print("Failed to open Claude: \(error)")
+                // Report AI integration errors to user
+                errorManager.reportError(UserError.aiIntegrationError(error))
             }
         }
     }
