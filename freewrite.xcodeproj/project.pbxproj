@@ -15,6 +15,7 @@
 		A66DC0A6DA81DD844592B102 /* TimerServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF38E6029EC8171C7380C3D6 /* TimerServiceProtocol.swift */; };
 		AC0EB21666DA589D2D8CB64F /* PDFExportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 709F7758C1D8E6BC9626074C /* PDFExportService.swift */; };
 		B96188A3DACB00BDD36115AF /* AIIntegrationServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C493C8DE5800A96EAB92B5AE /* AIIntegrationServiceProtocol.swift */; };
+		B9EA5603AB6FBCB08A5264CE /* ColorStrategy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9384A9623E2FBAD0D76C003C /* ColorStrategy.swift */; };
 		C769D77D7CCD07B56FB891D4 /* ServiceRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 103D68C89ABD4EB2B5173D3F /* ServiceRegistry.swift */; };
 		CC898963C95FEB101B35E044 /* UIState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 124665FE1DBD18C0A3A37834 /* UIState.swift */; };
 		CE27450DF7D7E62F35B7BE1A /* ScrollableTimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EECC40D44182D324E26F460 /* ScrollableTimerView.swift */; };
@@ -59,6 +60,7 @@
 		8573EFA62687C898C8BC30A2 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		8EFB0DDF0E49D46256170549 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		9259DA17304D4F7916BA172C /* freewriteApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = freewriteApp.swift; sourceTree = "<group>"; };
+		9384A9623E2FBAD0D76C003C /* ColorStrategy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorStrategy.swift; sourceTree = "<group>"; };
 		95AC40BE4F8405923746AEDB /* DTOs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DTOs.swift; sourceTree = "<group>"; };
 		98EAE80018C043BEBC524CE2 /* AIIntegrationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIIntegrationService.swift; sourceTree = "<group>"; };
 		C133BCD2B46681439AE5DA22 /* FileManagementService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileManagementService.swift; sourceTree = "<group>"; };
@@ -236,6 +238,7 @@
 		74507F6F48451F34223BC42C /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				9384A9623E2FBAD0D76C003C /* ColorStrategy.swift */,
 				8573EFA62687C898C8BC30A2 /* Constants.swift */,
 				95AC40BE4F8405923746AEDB /* DTOs.swift */,
 				1C53D2CB3D79587FF9590566 /* ErrorHandling.swift */,
@@ -468,6 +471,7 @@
 			files = (
 				30EB0705E42FE3E7CF2849FE /* AIIntegrationService.swift in Sources */,
 				B96188A3DACB00BDD36115AF /* AIIntegrationServiceProtocol.swift in Sources */,
+				B9EA5603AB6FBCB08A5264CE /* ColorStrategy.swift in Sources */,
 				EE8D42A000F6C75883618BC9 /* Constants.swift in Sources */,
 				DC78714507B4DDC9521E0398 /* ConstrainedTextEditor.swift in Sources */,
 				E9D8BC127B6289B9361A5C24 /* ContentView.swift in Sources */,

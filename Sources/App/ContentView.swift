@@ -13,7 +13,11 @@ struct ContentView: View {
     @State private var bottomNavOpacity: Double = 1.0
     @State private var isHoveringBottomNav = false
     @State private var placeholderText: String = ""
-    @State private var colorScheme: ColorScheme = .light
+    @AppStorage("colorScheme") private var colorSchemeString: String = "light"
+    
+    private var colorScheme: ColorScheme {
+        return colorSchemeString == "dark" ? .dark : .light
+    }
     @State private var showingSidebar = false
     @State private var isHoveringThemeToggle = false
     @State private var isHoveringClock = false
@@ -64,32 +68,38 @@ struct ContentView: View {
     }
     
     var body: some View {
-        let buttonBackground = colorScheme == .light ? Color.white : Color.black
         let navHeight: CGFloat = 68
-        let textColor = colorScheme == .light ? Color.gray : Color.gray.opacity(0.8)
-        let textHoverColor = colorScheme == .light ? Color.black : Color.white
+        let textColor = FreewriteColors.navigationText
+        let textHoverColor = FreewriteColors.navigationTextHover
         
         HStack(spacing: 0) {
             // Main content - matching original structure exactly
             ZStack {
-                Color(colorScheme == .light ? .white : .black)
+                FreewriteColors.contentBackground
                     .ignoresSafeArea()
                 
                 TextEditor(text: Binding(
                     get: { text },
                     set: { newValue in
-                        // Apply constraints inline - prevent backspacing, deletions
-                        if newValue.count < text.count {
+                        // Only apply constraints for actual deletions/edits, allow forward typing
+                        let currentTextContent = text.dropFirst(2) // Content after "\n\n"
+                        let newTextContent = newValue.dropFirst(2) // Content after "\n\n" 
+                        
+                        // Check if user is trying to delete/edit existing content
+                        if newValue.count >= 2 && newTextContent.count < currentTextContent.count {
                             NSSound.beep()
                             return
                         }
                         
                         // Ensure the text always starts with two newlines
+                        let processedValue: String
                         if !newValue.hasPrefix("\n\n") {
-                            text = "\n\n" + newValue.trimmingCharacters(in: .newlines)
+                            processedValue = "\n\n" + newValue.trimmingCharacters(in: .newlines)
                         } else {
-                            text = newValue
+                            processedValue = newValue
                         }
+                        
+                        text = processedValue
                         
                         // Auto-save with file service
                         Task {
@@ -97,9 +107,9 @@ struct ContentView: View {
                         }
                     }
                 ))
-                .background(Color(colorScheme == .light ? .white : .black))
+                .background(FreewriteColors.contentBackground)
                 .font(.custom(selectedFont, size: fontSize))
-                .foregroundColor(colorScheme == .light ? Color(red: 0.20, green: 0.20, blue: 0.20) : Color(red: 0.9, green: 0.9, blue: 0.9))
+                .foregroundColor(FreewriteColors.writingText)
                 .scrollContentBackground(.hidden)
                 .scrollIndicators(.never)
                 .lineSpacing(lineHeight)
@@ -107,7 +117,6 @@ struct ContentView: View {
                 .id("\(selectedFont)-\(fontSize)-\(colorScheme)")
                 .padding(.bottom, bottomNavOpacity > 0 ? navHeight : 0)
                 .ignoresSafeArea()
-                .colorScheme(colorScheme)
                 .onAppear {
                     placeholderText = placeholderOptions.randomElement() ?? "\n\nBegin writing"
                 }
@@ -116,7 +125,7 @@ struct ContentView: View {
                         if text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                             Text(placeholderText)
                                 .font(.custom(selectedFont, size: fontSize))
-                                .foregroundColor(colorScheme == .light ? .gray.opacity(0.5) : .gray.opacity(0.6))
+                                .foregroundColor(FreewriteColors.placeholderText)
                                 .allowsHitTesting(false)
                                 .offset(x: 5, y: placeholderOffset)
                         }
@@ -142,7 +151,7 @@ struct ContentView: View {
                                 }
                             }
                             .buttonStyle(.plain)
-                            .foregroundColor(isHoveringSize ? textHoverColor : textColor)
+                            .navigationButton(isHovering: isHoveringSize)
                             .onHover { hovering in
                                 isHoveringSize = hovering
                                 isHoveringBottomNav = hovering
@@ -169,13 +178,13 @@ struct ContentView: View {
                                 }
                             }
                             
-                            Text("•").foregroundColor(.gray)
+                            Text("•").foregroundColor(FreewriteColors.separator)
                             
                             Button("Lato") {
                                 selectedFont = "Lato-Regular"
                             }
                             .buttonStyle(.plain)
-                            .foregroundColor(hoveredFont == "Lato" ? textHoverColor : textColor)
+                            .navigationButton(isHovering: hoveredFont == "Lato")
                             .onHover { hovering in
                                 hoveredFont = hovering ? "Lato" : nil
                                 isHoveringBottomNav = hovering
@@ -186,13 +195,13 @@ struct ContentView: View {
                                 }
                             }
                             
-                            Text("•").foregroundColor(.gray)
+                            Text("•").foregroundColor(FreewriteColors.separator)
                             
                             Button("Arial") {
                                 selectedFont = "Arial"
                             }
                             .buttonStyle(.plain)
-                            .foregroundColor(hoveredFont == "Arial" ? textHoverColor : textColor)
+                            .navigationButton(isHovering: hoveredFont == "Arial")
                             .onHover { hovering in
                                 hoveredFont = hovering ? "Arial" : nil
                                 isHoveringBottomNav = hovering
@@ -203,13 +212,13 @@ struct ContentView: View {
                                 }
                             }
                             
-                            Text("•").foregroundColor(.gray)
+                            Text("•").foregroundColor(FreewriteColors.separator)
                             
                             Button("System") {
                                 selectedFont = ".AppleSystemUIFont"
                             }
                             .buttonStyle(.plain)
-                            .foregroundColor(hoveredFont == "System" ? textHoverColor : textColor)
+                            .navigationButton(isHovering: hoveredFont == "System")
                             .onHover { hovering in
                                 hoveredFont = hovering ? "System" : nil
                                 isHoveringBottomNav = hovering
@@ -220,13 +229,13 @@ struct ContentView: View {
                                 }
                             }
                             
-                            Text("•").foregroundColor(.gray)
+                            Text("•").foregroundColor(FreewriteColors.separator)
                             
                             Button("Serif") {
                                 selectedFont = "Times New Roman"
                             }
                             .buttonStyle(.plain)
-                            .foregroundColor(hoveredFont == "Serif" ? textHoverColor : textColor)
+                            .navigationButton(isHovering: hoveredFont == "Serif")
                             .onHover { hovering in
                                 hoveredFont = hovering ? "Serif" : nil
                                 isHoveringBottomNav = hovering
@@ -237,7 +246,7 @@ struct ContentView: View {
                                 }
                             }
                             
-                            Text("•").foregroundColor(.gray)
+                            Text("•").foregroundColor(FreewriteColors.separator)
                             
                             Button("Random") {
                                 if let randomFont = NSFontManager.shared.availableFontFamilies.randomElement() {
@@ -245,7 +254,7 @@ struct ContentView: View {
                                 }
                             }
                             .buttonStyle(.plain)
-                            .foregroundColor(hoveredFont == "Random" ? textHoverColor : textColor)
+                            .navigationButton(isHovering: hoveredFont == "Random")
                             .onHover { hovering in
                                 hoveredFont = hovering ? "Random" : nil
                                 isHoveringBottomNav = hovering
@@ -275,7 +284,7 @@ struct ContentView: View {
                                 }
                             }
                             .buttonStyle(.plain)
-                            .foregroundColor(isHoveringTimer ? textHoverColor : textColor)
+                            .foregroundColor(FreewriteColors.timerColor(isRunning: timerService.isRunning, isHovering: isHoveringTimer))
                             .onHover { hovering in
                                 isHoveringTimer = hovering
                                 isHoveringBottomNav = hovering
@@ -305,7 +314,7 @@ struct ContentView: View {
                                 }
                             }
                             
-                            Text("•").foregroundColor(.gray)
+                            Text("•").foregroundColor(FreewriteColors.separator)
                             
                             if canUseChat {
                                 Button("Chat") {
@@ -313,7 +322,7 @@ struct ContentView: View {
                                     didCopyPrompt = false
                                 }
                                 .buttonStyle(.plain)
-                                .foregroundColor(isHoveringChat ? textHoverColor : textColor)
+                                .navigationButton(isHovering: isHoveringChat)
                                 .onHover { hovering in
                                     isHoveringChat = hovering
                                     isHoveringBottomNav = hovering
@@ -377,7 +386,7 @@ struct ContentView: View {
                                         }
                                     }
                                     .frame(minWidth: 120, maxWidth: 250)
-                                    .background(Color(NSColor.controlBackgroundColor))
+                                    .background(FreewriteColors.popoverBackground)
                                     .cornerRadius(8)
                                     .shadow(color: Color.black.opacity(0.1), radius: 4, y: 2)
                                     .onChange(of: showingChatMenu) { newValue in
@@ -387,14 +396,14 @@ struct ContentView: View {
                                     }
                                 }
                                 
-                                Text("•").foregroundColor(.gray)
+                                Text("•").foregroundColor(FreewriteColors.separator)
                             }
                             
                             Button(action: {
-                                colorScheme = colorScheme == .light ? .dark : .light
+                                colorSchemeString = colorScheme == .light ? "dark" : "light"
                             }) {
                                 Image(systemName: colorScheme == .light ? "moon.fill" : "sun.max.fill")
-                                    .foregroundColor(isHoveringThemeToggle ? textHoverColor : textColor)
+                                    .foregroundColor(FreewriteColors.themeToggle.tinted(with: isHoveringThemeToggle ? .white : .clear))
                             }
                             .buttonStyle(.plain)
                             .onHover { hovering in
@@ -407,7 +416,7 @@ struct ContentView: View {
                                 }
                             }
 
-                            Text("•").foregroundColor(.gray)
+                            Text("•").foregroundColor(FreewriteColors.separator)
                             
                             Button(isFullscreen ? "Minimize" : "Fullscreen") {
                                 if let window = NSApplication.shared.windows.first {
@@ -415,7 +424,7 @@ struct ContentView: View {
                                 }
                             }
                             .buttonStyle(.plain)
-                            .foregroundColor(isHoveringFullscreen ? textHoverColor : textColor)
+                            .navigationButton(isHovering: isHoveringFullscreen)
                             .onHover { hovering in
                                 isHoveringFullscreen = hovering
                                 isHoveringBottomNav = hovering
@@ -426,7 +435,7 @@ struct ContentView: View {
                                 }
                             }
 
-                            Text("•").foregroundColor(.gray)
+                            Text("•").foregroundColor(FreewriteColors.separator)
                             
                             Button("New Entry") {
                                 Task {
@@ -434,7 +443,7 @@ struct ContentView: View {
                                 }
                             }
                             .buttonStyle(.plain)
-                            .foregroundColor(isHoveringNewEntry ? textHoverColor : textColor)
+                            .navigationButton(isHovering: isHoveringNewEntry)
                             .onHover { hovering in
                                 isHoveringNewEntry = hovering
                                 isHoveringBottomNav = hovering
@@ -445,7 +454,7 @@ struct ContentView: View {
                                 }
                             }
                             
-                            Text("•").foregroundColor(.gray)
+                            Text("•").foregroundColor(FreewriteColors.separator)
                             
                             Button(action: {
                                 withAnimation(.easeInOut(duration: 0.2)) {
@@ -453,7 +462,7 @@ struct ContentView: View {
                                 }
                             }) {
                                 Image(systemName: "clock.arrow.circlepath")
-                                    .foregroundColor(isHoveringClock ? textHoverColor : textColor)
+                                    .foregroundColor(FreewriteColors.navigationTextColor(isHovering: isHoveringClock))
                             }
                             .buttonStyle(.plain)
                             .onHover { hovering in
@@ -473,7 +482,7 @@ struct ContentView: View {
                         }
                     }
                     .padding()
-                    .background(Color(colorScheme == .light ? .white : .black))
+                    .background(FreewriteColors.navigationBackground)
                     .opacity(bottomNavOpacity)
                     .onHover { hovering in
                         isHoveringBottomNav = hovering
@@ -555,7 +564,7 @@ struct ContentView: View {
                                                         }) {
                                                             Image(systemName: "trash")
                                                                 .font(.system(size: 11))
-                                                                .foregroundColor(.red)
+                                                                .foregroundColor(FreewriteColors.deleteAction)
                                                         }
                                                         .buttonStyle(.plain)
                                                     }
@@ -572,8 +581,10 @@ struct ContentView: View {
                                     .padding(.vertical, 8)
                                     .background(
                                         RoundedRectangle(cornerRadius: 4)
-                                            .fill(entry.id == selectedEntryId ? Color.gray.opacity(0.1) : 
-                                                  entry.id == hoveredEntryId ? Color.gray.opacity(0.05) : Color.clear)
+                                            .fill(FreewriteColors.entryBackground(
+                                                isSelected: entry.id == selectedEntryId, 
+                                                isHovered: entry.id == hoveredEntryId
+                                            ))
                                     )
                                 }
                                 .buttonStyle(.plain)
@@ -593,12 +604,13 @@ struct ContentView: View {
                     .scrollIndicators(.never)
                 }
                 .frame(width: 200)
-                .background(Color(colorScheme == .light ? .white : .black))
+                .background(FreewriteColors.sidebarBackground)
             }
         }
         .frame(minWidth: 1100, minHeight: 600)
         .animation(.easeInOut(duration: 0.2), value: showingSidebar)
         .preferredColorScheme(colorScheme)
+        .background(FreewriteColors.contentBackground) // Ensure entire window uses system background
         .onAppear {
             setupInitialState()
         }
