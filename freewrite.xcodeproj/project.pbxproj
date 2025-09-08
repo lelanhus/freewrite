@@ -14,25 +14,31 @@
 		1A1D9B2971D271AABA6989EC /* FreewriteTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 875F016C37F8E7BDCD41B92C /* FreewriteTimer.swift */; };
 		1B1B1204C6DA54BEFD0EFBEE /* ConstrainedTextEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF35EA7FBE37DC8D5C577FF /* ConstrainedTextEditor.swift */; };
 		1C59B187AE4A17750BE3EBD6 /* ServiceRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EF277EF381D8A79886DA5F /* ServiceRegistry.swift */; };
+		36A444366E90A73B32A9ECDA /* ChatMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 491FC192C28DBF1ED4D554F9 /* ChatMenu.swift */; };
 		38AAFADFCB4A0CE0425CCF5B /* Lato-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1C190C743F912C6C03AF19F5 /* Lato-BoldItalic.ttf */; };
+		3D50860F25B38DA202850B87 /* FontControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C5898BAF4655E386AD1580B /* FontControls.swift */; };
 		40978D4D9636F15D69883052 /* OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = 87EA0B0E53A9285554C87559 /* OFL.txt */; };
 		4CC7E84A5EC1373EFC46DD28 /* Lato-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DCF11E472E74AF5F610730E1 /* Lato-Regular.ttf */; };
 		4CFF7BC546E168A372BBB213 /* ErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65FEF6F8EF42BF77B7B2F656 /* ErrorHandling.swift */; };
 		6052C9E6762D478418B980AD /* AIIntegrationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69295D906BBEFD2FE6773AF2 /* AIIntegrationService.swift */; };
 		6B3BD5CADC66EC26D84C23E3 /* FreewriteTimerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A98C6B66F035C0530B93E63 /* FreewriteTimerTests.swift */; };
+		6B7B1EB8B830431F95EE8383 /* ContentViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2E3E196BA327A817CAB72E5 /* ContentViewModel.swift */; };
 		74C2183235442328CEA34244 /* Lato-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7CE1C429577B25F2C145616E /* Lato-Italic.ttf */; };
 		7CD676B68DDA975B5158D93F /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEDCF616EE1F6993836D0BB8 /* ContentView.swift */; };
 		8955A33FE70B04A209AF9DF7 /* freewriteUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DBB6E003AEEBEE410824308 /* freewriteUITestsLaunchTests.swift */; };
 		93AEDF7D00B5E492F39F0DB5 /* ExportServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA2FE8BA310C1BFE8A198B5B /* ExportServiceProtocol.swift */; };
 		983499DC7EAB450A9C40A3BA /* AIIntegrationServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCD8BF40854FE606F01FEA2F /* AIIntegrationServiceTests.swift */; };
 		9AA4265D99627686E3D3693B /* PDFExportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 727881524EBE3AF85305AFDC /* PDFExportService.swift */; };
+		9F91F06B1C3E9F3E58637EA6 /* NavigationBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 330EF686043D4852B071BDE4 /* NavigationBar.swift */; };
 		A1DEE3C4B2B94759DF2124D1 /* AIIntegrationServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AE40DA70CD04C21BC3C8C01 /* AIIntegrationServiceProtocol.swift */; };
 		AB108C2CF443E01592F83BE7 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14478E4E33268780C5F0DC24 /* Constants.swift */; };
 		AC2A28BDB548B3AB0864E603 /* ColorStrategy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 751C0412F2E2CFF1B4568A47 /* ColorStrategy.swift */; };
 		B2AF61E9490442FFCC6E6052 /* FileManagementServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FFBE9A5852FF6885F2AD682 /* FileManagementServiceProtocol.swift */; };
+		B44AE41982AE792976176ED2 /* ContentView+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBC26B080809717E5D4A55D /* ContentView+Extensions.swift */; };
 		B4FB153F8F5946D069AC8056 /* Lato-LightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C09265D9DDAFBA94379F65FD /* Lato-LightItalic.ttf */; };
 		B5E93939515194CC946BA23B /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B941C40B51DD5C66A7F320DA /* Preview Assets.xcassets */; };
 		B765C7468702065E9B97FBE3 /* UIState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A68B703537F875B6AB55B62F /* UIState.swift */; };
+		B8A1FA41CB18F78D40019A02 /* Sidebar.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA7CD69E5602F6DA1A2B09A7 /* Sidebar.swift */; };
 		BAF8A03C07890E9F9D6A4AD3 /* Lato-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4ADE7B9AAE1FB90597028C69 /* Lato-Black.ttf */; };
 		C3BF0DB4D747FCDE5CDE05C3 /* Lato-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9B73308BD7D863955E7D7547 /* Lato-Bold.ttf */; };
 		C54DDBBF284C0983EDCEF7AF /* freewriteApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3602041168C35DF7E35D3B4 /* freewriteApp.swift */; };
@@ -71,9 +77,11 @@
 		14478E4E33268780C5F0DC24 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		1C190C743F912C6C03AF19F5 /* Lato-BoldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-BoldItalic.ttf"; sourceTree = "<group>"; };
 		2AA059BA6ABF7B6A39C7E82A /* DIContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DIContainer.swift; sourceTree = "<group>"; };
+		330EF686043D4852B071BDE4 /* NavigationBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBar.swift; sourceTree = "<group>"; };
 		347C52F9AB41701D2A1C848B /* Lato-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-Light.ttf"; sourceTree = "<group>"; };
 		3DBB6E003AEEBEE410824308 /* freewriteUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = freewriteUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		4061B5C6B4942F7513E06A53 /* default.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = default.md; sourceTree = "<group>"; };
+		491FC192C28DBF1ED4D554F9 /* ChatMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMenu.swift; sourceTree = "<group>"; };
 		4A98C6B66F035C0530B93E63 /* FreewriteTimerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreewriteTimerTests.swift; sourceTree = "<group>"; };
 		4ADE7B9AAE1FB90597028C69 /* Lato-Black.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-Black.ttf"; sourceTree = "<group>"; };
 		4AE40DA70CD04C21BC3C8C01 /* AIIntegrationServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIIntegrationServiceProtocol.swift; sourceTree = "<group>"; };
@@ -83,9 +91,11 @@
 		6264FCC56AC36EF40B7A4E72 /* TimerServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerServiceProtocol.swift; sourceTree = "<group>"; };
 		65FEF6F8EF42BF77B7B2F656 /* ErrorHandling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorHandling.swift; sourceTree = "<group>"; };
 		69295D906BBEFD2FE6773AF2 /* AIIntegrationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIIntegrationService.swift; sourceTree = "<group>"; };
+		6DBC26B080809717E5D4A55D /* ContentView+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ContentView+Extensions.swift"; sourceTree = "<group>"; };
 		727881524EBE3AF85305AFDC /* PDFExportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFExportService.swift; sourceTree = "<group>"; };
 		73299758605681F4D1216BFE /* Freewrite.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Freewrite.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		751C0412F2E2CFF1B4568A47 /* ColorStrategy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorStrategy.swift; sourceTree = "<group>"; };
+		7C5898BAF4655E386AD1580B /* FontControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontControls.swift; sourceTree = "<group>"; };
 		7CE1C429577B25F2C145616E /* Lato-Italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-Italic.ttf"; sourceTree = "<group>"; };
 		7FFBE9A5852FF6885F2AD682 /* FileManagementServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileManagementServiceProtocol.swift; sourceTree = "<group>"; };
 		858B40DC2EF0739D4AF076D8 /* FileManagementServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileManagementServiceTests.swift; sourceTree = "<group>"; };
@@ -100,7 +110,9 @@
 		BFF35EA7FBE37DC8D5C577FF /* ConstrainedTextEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstrainedTextEditor.swift; sourceTree = "<group>"; };
 		C09265D9DDAFBA94379F65FD /* Lato-LightItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-LightItalic.ttf"; sourceTree = "<group>"; };
 		C3A4B4B438DC6893C64FEC9A /* Lato-ThinItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-ThinItalic.ttf"; sourceTree = "<group>"; };
+		CA7CD69E5602F6DA1A2B09A7 /* Sidebar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sidebar.swift; sourceTree = "<group>"; };
 		CCD8BF40854FE606F01FEA2F /* AIIntegrationServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIIntegrationServiceTests.swift; sourceTree = "<group>"; };
+		D2E3E196BA327A817CAB72E5 /* ContentViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentViewModel.swift; sourceTree = "<group>"; };
 		DCF11E472E74AF5F610730E1 /* Lato-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-Regular.ttf"; sourceTree = "<group>"; };
 		E2D64BE06A4D02F789E17CEE /* freewriteUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = freewriteUITests.swift; sourceTree = "<group>"; };
 		E6EF277EF381D8A79886DA5F /* ServiceRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceRegistry.swift; sourceTree = "<group>"; };
@@ -162,6 +174,25 @@
 			children = (
 			);
 			path = UnitTests;
+			sourceTree = "<group>";
+		};
+		1AD2042299C0752E5E8BACEF /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				D2E3E196BA327A817CAB72E5 /* ContentViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		1BBE6FB8C2913FC07D30F940 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				491FC192C28DBF1ED4D554F9 /* ChatMenu.swift */,
+				7C5898BAF4655E386AD1580B /* FontControls.swift */,
+				330EF686043D4852B071BDE4 /* NavigationBar.swift */,
+				CA7CD69E5602F6DA1A2B09A7 /* Sidebar.swift */,
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 		2E90AD2F4C72CA086269D847 /* Models */ = {
@@ -435,9 +466,12 @@
 			isa = PBXGroup;
 			children = (
 				BD765A01348467E12A45E9F4 /* Core */,
+				FD611840D6096219507CF35F /* Extensions */,
 				EB760DE607B47B913DD51DC8 /* Features */,
 				2F34CA8115599F72E42A107B /* fonts */,
 				9F387F5C8A852C7C7A27B17B /* Preview Content */,
+				1AD2042299C0752E5E8BACEF /* ViewModels */,
+				1BBE6FB8C2913FC07D30F940 /* Views */,
 				9230E1B84F9CB5723D08D396 /* Assets.xcassets */,
 				EEDCF616EE1F6993836D0BB8 /* ContentView.swift */,
 				4061B5C6B4942F7513E06A53 /* default.md */,
@@ -455,6 +489,14 @@
 				5BF2EAF5B8F49A8D7121BEB8 /* FreewriteUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		FD611840D6096219507CF35F /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				6DBC26B080809717E5D4A55D /* ContentView+Extensions.swift */,
+			);
+			path = Extensions;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -593,20 +635,26 @@
 			files = (
 				6052C9E6762D478418B980AD /* AIIntegrationService.swift in Sources */,
 				A1DEE3C4B2B94759DF2124D1 /* AIIntegrationServiceProtocol.swift in Sources */,
+				36A444366E90A73B32A9ECDA /* ChatMenu.swift in Sources */,
 				AC2A28BDB548B3AB0864E603 /* ColorStrategy.swift in Sources */,
 				AB108C2CF443E01592F83BE7 /* Constants.swift in Sources */,
 				1B1B1204C6DA54BEFD0EFBEE /* ConstrainedTextEditor.swift in Sources */,
+				B44AE41982AE792976176ED2 /* ContentView+Extensions.swift in Sources */,
 				7CD676B68DDA975B5158D93F /* ContentView.swift in Sources */,
+				6B7B1EB8B830431F95EE8383 /* ContentViewModel.swift in Sources */,
 				DF6167F78B54ED956B1E3672 /* DIContainer.swift in Sources */,
 				E4D30B07BEDF2968966CD2DB /* DTOs.swift in Sources */,
 				4CFF7BC546E168A372BBB213 /* ErrorHandling.swift in Sources */,
 				93AEDF7D00B5E492F39F0DB5 /* ExportServiceProtocol.swift in Sources */,
 				C843BC3514D5AAE7610E9E72 /* FileManagementService.swift in Sources */,
 				B2AF61E9490442FFCC6E6052 /* FileManagementServiceProtocol.swift in Sources */,
+				3D50860F25B38DA202850B87 /* FontControls.swift in Sources */,
 				1A1D9B2971D271AABA6989EC /* FreewriteTimer.swift in Sources */,
+				9F91F06B1C3E9F3E58637EA6 /* NavigationBar.swift in Sources */,
 				9AA4265D99627686E3D3693B /* PDFExportService.swift in Sources */,
 				FF09D0A48EBF3AA326EED601 /* ScrollableTimerView.swift in Sources */,
 				1C59B187AE4A17750BE3EBD6 /* ServiceRegistry.swift in Sources */,
+				B8A1FA41CB18F78D40019A02 /* Sidebar.swift in Sources */,
 				068B80F3EC89F84CAAB1966D /* TimerServiceProtocol.swift in Sources */,
 				B765C7468702065E9B97FBE3 /* UIState.swift in Sources */,
 				C54DDBBF284C0983EDCEF7AF /* freewriteApp.swift in Sources */,
