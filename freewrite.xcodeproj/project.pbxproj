@@ -9,12 +9,14 @@
 /* Begin PBXBuildFile section */
 		1825564734733329B116B690 /* FreewriteTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1F0F4B2A8A561633C746CCD /* FreewriteTimer.swift */; };
 		30EB0705E42FE3E7CF2849FE /* AIIntegrationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98EAE80018C043BEBC524CE2 /* AIIntegrationService.swift */; };
+		5CA28D57E1723B0050905AED /* ErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C53D2CB3D79587FF9590566 /* ErrorHandling.swift */; };
 		61C2BD4775765C4DDF86E72E /* FileManagementService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C133BCD2B46681439AE5DA22 /* FileManagementService.swift */; };
 		7A4FB4023703C63873928D7B /* DTOs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95AC40BE4F8405923746AEDB /* DTOs.swift */; };
 		A66DC0A6DA81DD844592B102 /* TimerServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF38E6029EC8171C7380C3D6 /* TimerServiceProtocol.swift */; };
 		AC0EB21666DA589D2D8CB64F /* PDFExportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 709F7758C1D8E6BC9626074C /* PDFExportService.swift */; };
 		B96188A3DACB00BDD36115AF /* AIIntegrationServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C493C8DE5800A96EAB92B5AE /* AIIntegrationServiceProtocol.swift */; };
 		C769D77D7CCD07B56FB891D4 /* ServiceRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 103D68C89ABD4EB2B5173D3F /* ServiceRegistry.swift */; };
+		CC898963C95FEB101B35E044 /* UIState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 124665FE1DBD18C0A3A37834 /* UIState.swift */; };
 		CE27450DF7D7E62F35B7BE1A /* ScrollableTimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EECC40D44182D324E26F460 /* ScrollableTimerView.swift */; };
 		CEBAA6B4A3119928BD92C514 /* FileManagementServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6E16840F3F2192B23C413D0 /* FileManagementServiceProtocol.swift */; };
 		DC78714507B4DDC9521E0398 /* ConstrainedTextEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2972F042010C12670523CE6A /* ConstrainedTextEditor.swift */; };
@@ -45,6 +47,8 @@
 
 /* Begin PBXFileReference section */
 		103D68C89ABD4EB2B5173D3F /* ServiceRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceRegistry.swift; sourceTree = "<group>"; };
+		124665FE1DBD18C0A3A37834 /* UIState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIState.swift; sourceTree = "<group>"; };
+		1C53D2CB3D79587FF9590566 /* ErrorHandling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorHandling.swift; sourceTree = "<group>"; };
 		2972F042010C12670523CE6A /* ConstrainedTextEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstrainedTextEditor.swift; sourceTree = "<group>"; };
 		44224E84B691854507A46312 /* DIContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DIContainer.swift; sourceTree = "<group>"; };
 		5BF2EAF5B8F49A8D7121BEB8 /* FreewriteUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FreewriteUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -234,6 +238,7 @@
 			children = (
 				8573EFA62687C898C8BC30A2 /* Constants.swift */,
 				95AC40BE4F8405923746AEDB /* DTOs.swift */,
+				1C53D2CB3D79587FF9590566 /* ErrorHandling.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -255,6 +260,7 @@
 		9D14325D02802EC61722413C /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				124665FE1DBD18C0A3A37834 /* UIState.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -468,6 +474,7 @@
 				E9D8BC127B6289B9361A5C24 /* ContentView.swift in Sources */,
 				E3238304F9A84D0E4D30C6C1 /* DIContainer.swift in Sources */,
 				7A4FB4023703C63873928D7B /* DTOs.swift in Sources */,
+				5CA28D57E1723B0050905AED /* ErrorHandling.swift in Sources */,
 				EA6C30B380A98608D8653AE5 /* ExportServiceProtocol.swift in Sources */,
 				61C2BD4775765C4DDF86E72E /* FileManagementService.swift in Sources */,
 				CEBAA6B4A3119928BD92C514 /* FileManagementServiceProtocol.swift in Sources */,
@@ -476,6 +483,7 @@
 				CE27450DF7D7E62F35B7BE1A /* ScrollableTimerView.swift in Sources */,
 				C769D77D7CCD07B56FB891D4 /* ServiceRegistry.swift in Sources */,
 				A66DC0A6DA81DD844592B102 /* TimerServiceProtocol.swift in Sources */,
+				CC898963C95FEB101B35E044 /* UIState.swift in Sources */,
 				FBA541B6BD926339BFEF82EB /* freewriteApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
