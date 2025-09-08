@@ -22,11 +22,22 @@ The app implements the freewriting methodology developed in 1973 - continuous wr
 
 ## Development Commands
 
-**Project Management (XcodeGen):**
+**Build & Test Commands (Xcode CLI Tools ONLY):**
 - `make generate` - Generate Xcode project from YAML
-- `make build` - Build the project  
-- `make check` - Build and run unit tests (development verification)
+- `make build` - Build the project using Xcode CLI
+- `make check` - Build and run unit tests using Xcode CLI
 - `make clean` - Remove generated files
+
+**IMPORTANT: Use Xcode CLI tools, NOT Swift commands**
+- ✅ `xcodebuild -scheme Freewrite -destination 'platform=macOS,arch=arm64' build` 
+- ✅ `xcodebuild test -scheme Freewrite -destination 'platform=macOS,arch=arm64'`
+- ❌ `swift build` (do not use - project uses Xcode, not Swift Package Manager)
+- ❌ `swift test` (do not use - tests configured for Xcode, not SPM)
+
+**Build Configuration:**
+- Target Apple Silicon (arm64) architecture specifically
+- Use Xcode's dependency resolution and build system
+- SwiftTesting framework is built into Swift 6 (no external packages needed)
 
 **Setup:**
 - New developers: Install XcodeGen (`brew install xcodegen`), then `make generate`

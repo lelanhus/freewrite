@@ -26,7 +26,6 @@
 		93AEDF7D00B5E492F39F0DB5 /* ExportServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA2FE8BA310C1BFE8A198B5B /* ExportServiceProtocol.swift */; };
 		983499DC7EAB450A9C40A3BA /* AIIntegrationServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCD8BF40854FE606F01FEA2F /* AIIntegrationServiceTests.swift */; };
 		9AA4265D99627686E3D3693B /* PDFExportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 727881524EBE3AF85305AFDC /* PDFExportService.swift */; };
-		9C4FF9C9E2C405BB157A7C69 /* ReusableComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD2356417E47A890876A4607 /* ReusableComponents.swift */; };
 		A1DEE3C4B2B94759DF2124D1 /* AIIntegrationServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AE40DA70CD04C21BC3C8C01 /* AIIntegrationServiceProtocol.swift */; };
 		AB108C2CF443E01592F83BE7 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14478E4E33268780C5F0DC24 /* Constants.swift */; };
 		AC2A28BDB548B3AB0864E603 /* ColorStrategy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 751C0412F2E2CFF1B4568A47 /* ColorStrategy.swift */; };
@@ -98,7 +97,6 @@
 		A68B703537F875B6AB55B62F /* UIState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIState.swift; sourceTree = "<group>"; };
 		AFC435D41326C9A4D20FDD5C /* freewriteTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = freewriteTests.swift; sourceTree = "<group>"; };
 		B941C40B51DD5C66A7F320DA /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		BD2356417E47A890876A4607 /* ReusableComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReusableComponents.swift; sourceTree = "<group>"; };
 		BFF35EA7FBE37DC8D5C577FF /* ConstrainedTextEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstrainedTextEditor.swift; sourceTree = "<group>"; };
 		C09265D9DDAFBA94379F65FD /* Lato-LightItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-LightItalic.ttf"; sourceTree = "<group>"; };
 		C3A4B4B438DC6893C64FEC9A /* Lato-ThinItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-ThinItalic.ttf"; sourceTree = "<group>"; };
@@ -273,7 +271,6 @@
 		6B876407792BEA3E43A53B76 /* Components */ = {
 			isa = PBXGroup;
 			children = (
-				BD2356417E47A890876A4607 /* ReusableComponents.swift */,
 				F74AE4FDD163B3A90C11F892 /* ScrollableTimerView.swift */,
 			);
 			path = Components;
@@ -608,7 +605,6 @@
 				B2AF61E9490442FFCC6E6052 /* FileManagementServiceProtocol.swift in Sources */,
 				1A1D9B2971D271AABA6989EC /* FreewriteTimer.swift in Sources */,
 				9AA4265D99627686E3D3693B /* PDFExportService.swift in Sources */,
-				9C4FF9C9E2C405BB157A7C69 /* ReusableComponents.swift in Sources */,
 				FF09D0A48EBF3AA326EED601 /* ScrollableTimerView.swift in Sources */,
 				1C59B187AE4A17750BE3EBD6 /* ServiceRegistry.swift in Sources */,
 				068B80F3EC89F84CAAB1966D /* TimerServiceProtocol.swift in Sources */,
