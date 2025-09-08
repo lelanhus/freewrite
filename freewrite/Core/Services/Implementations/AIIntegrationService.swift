@@ -66,6 +66,12 @@ final class AIIntegrationService: AIIntegrationServiceProtocol {
     func copyPromptToClipboard(content: String, prompt: String? = nil) {
         let fullText = createPromptForClipboard(content: content, prompt: prompt)
         
+        // Validate clipboard content size to prevent system issues
+        if fullText.count > 10_000_000 { // 10MB limit for clipboard safety
+            print("ERROR: Content too large for clipboard (\(fullText.count) characters)")
+            return
+        }
+        
         // Safe clipboard operations with error handling
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()
@@ -75,6 +81,7 @@ final class AIIntegrationService: AIIntegrationServiceProtocol {
             print("Successfully copied prompt to clipboard (\(fullText.count) characters)")
         } else {
             print("ERROR: Failed to copy prompt to clipboard")
+            // Note: Errors are now handled at the ContentView level with proper user presentation
         }
     }
     
