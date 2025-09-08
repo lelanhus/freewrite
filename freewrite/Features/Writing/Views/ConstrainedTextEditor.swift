@@ -143,17 +143,15 @@ struct FreewriteTextEditor: NSViewRepresentable {
         
         // Only update if text is different to avoid cursor jumping
         if textView.string != text {
-            let currentSelection = textView.selectedRange()
             textView.string = text
             
-            // Restore selection if valid
-            let newLength = text.count
-            if currentSelection.location <= newLength {
-                textView.setSelectedRange(NSRange(
-                    location: min(currentSelection.location, newLength),
-                    length: 0
-                ))
-            }
+            // Consistent selection restoration - always place cursor at end for freewriting
+            let targetLocation = text.count // Always place cursor at end for forward-only writing
+            
+            textView.setSelectedRange(NSRange(location: targetLocation, length: 0))
+            
+            // Ensure cursor is visible after text update
+            textView.scrollRangeToVisible(NSRange(location: targetLocation, length: 0))
         }
     }
     
@@ -190,15 +188,17 @@ extension NSTextView {
             return
         }
         
-        // Block arrow keys when they would move cursor backwards for editing
+        // Consistent selection handling - maintain cursor at end for freewriting
         if event.keyCode == 123 || event.keyCode == 124 { // Left or Right arrows
             let currentSelection = selectedRange()
-            if event.keyCode == 123 && currentSelection.location > 0 { // Left arrow
-                // Only allow if at the very end of text
-                if currentSelection.location < string.count {
-                    NSSound.beep()
-                    return
-                }
+            
+            // Always enforce cursor at end for consistent freewriting behavior
+            if currentSelection.location < string.count {
+                NSSound.beep()
+                // Force cursor back to end
+                setSelectedRange(NSRange(location: string.count, length: 0))
+                scrollRangeToVisible(NSRange(location: string.count, length: 0))
+                return
             }
         }
         
@@ -223,12 +223,20 @@ extension NSTextView {
     }
     
     private func handlePaste(_ event: NSEvent) {
-        // Allow paste only at the end of text
+        // Consistent paste behavior - always paste at end of text
         let currentSelection = selectedRange()
         if currentSelection.location == string.count {
             super.keyDown(with: event)
+            // Ensure cursor stays at end after paste
+            DispatchQueue.main.async {
+                self.setSelectedRange(NSRange(location: self.string.count, length: 0))
+                self.scrollRangeToVisible(NSRange(location: self.string.count, length: 0))
+            }
         } else {
             NSSound.beep()
+            // Force cursor to end for consistent state
+            setSelectedRange(NSRange(location: string.count, length: 0))
+            scrollRangeToVisible(NSRange(location: string.count, length: 0))
         }
     }
 }
