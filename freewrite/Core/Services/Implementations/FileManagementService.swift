@@ -20,6 +20,10 @@ final class FileManagementService: FileManagementServiceProtocol {
     // File operation coordination to prevent corruption
     private var activeSaveOperations: Set<UUID> = []
     
+    // Directory monitoring for intelligent cache invalidation (nonisolated for deinit access)
+    nonisolated(unsafe) private var directoryMonitor: DispatchSourceFileSystemObject?
+    private let monitorQueue = DispatchQueue(label: "freewrite.directorymonitor", qos: .utility)
+    
     // Cached documents directory for performance
     private lazy var documentsDirectory: URL = {
         let directory = fileManager
@@ -38,6 +42,9 @@ final class FileManagementService: FileManagementServiceProtocol {
                 print("Error creating directory: \(error)")
             }
         }
+        
+        // Setup directory monitoring after directory is created
+        setupDirectoryMonitoring()
         
         return directory
     }()
@@ -429,5 +436,48 @@ final class FileManagementService: FileManagementServiceProtocol {
             print("Warning: Could not get modification date for \(fileURL.lastPathComponent): \(error)")
             return nil
         }
+    }
+    
+    // MARK: - Directory Monitoring (Intelligent Cache Invalidation)
+    
+    private func setupDirectoryMonitoring() {
+        let directoryPath = documentsDirectory.path
+        let descriptor = open(directoryPath, O_EVTONLY)
+        
+        guard descriptor >= 0 else {
+            print("Warning: Could not open directory for monitoring: \(directoryPath)")
+            return
+        }
+        
+        // Setup file system event monitoring for intelligent cache invalidation
+        directoryMonitor = DispatchSource.makeFileSystemObjectSource(
+            fileDescriptor: descriptor,
+            eventMask: [.write, .rename, .delete],
+            queue: monitorQueue
+        )
+        
+        directoryMonitor?.setEventHandler { [weak self] in
+            // Directory changed - invalidate cache to force refresh on next access
+            Task { @MainActor in
+                self?.invalidateCache()
+                print("Directory changed - cache invalidated")
+            }
+        }
+        
+        directoryMonitor?.setCancelHandler {
+            close(descriptor)
+        }
+        
+        directoryMonitor?.resume()
+        print("Directory monitoring enabled for: \(directoryPath)")
+    }
+    
+    nonisolated private func cleanupDirectoryMonitoring() {
+        directoryMonitor?.cancel()
+        directoryMonitor = nil
+    }
+    
+    deinit {
+        cleanupDirectoryMonitoring()
     }
 }
