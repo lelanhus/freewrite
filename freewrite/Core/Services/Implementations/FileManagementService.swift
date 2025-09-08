@@ -54,21 +54,33 @@ final class FileManagementService: FileManagementServiceProtocol {
             modifiedAt: now
         )
         
-        // Create empty file
+        // Atomic file creation with rollback capability
         let fileURL = documentsDirectory.appendingPathComponent(filename)
         let initialContent = FreewriteConstants.headerString
         
-        do {
-            try initialContent.write(to: fileURL, atomically: true, encoding: .utf8)
-            print("Created new entry: \(filename)")
-            
-            // Update cache with new entry
-            updateCacheEntry(entry)
-        } catch {
-            throw FreewriteError.fileOperationFailed("Failed to create entry: \(error)")
+        // Check if file already exists to prevent overwriting
+        if fileManager.fileExists(atPath: fileURL.path) {
+            throw FreewriteError.fileOperationFailed("Entry file already exists: \(filename)")
         }
         
-        return entry
+        do {
+            // Step 1: Create file atomically
+            try initialContent.write(to: fileURL, atomically: true, encoding: .utf8)
+            
+            // Step 2: Update cache (if this fails, rollback file creation)
+            updateCacheEntry(entry)
+            
+            print("Created new entry: \(filename)")
+            return entry
+            
+        } catch {
+            // Rollback: Remove file if it was created but cache update failed
+            if fileManager.fileExists(atPath: fileURL.path) {
+                try? fileManager.removeItem(at: fileURL)
+                print("Rolled back file creation for: \(filename)")
+            }
+            throw FreewriteError.fileOperationFailed("Failed to create entry: \(error)")
+        }
     }
     
     func loadEntry(_ entryId: UUID) async throws -> String {
