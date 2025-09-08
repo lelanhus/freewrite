@@ -109,6 +109,10 @@ final class TypographyStateManager {
         return computed
     }
     
+    var fontSizeButtonTitle: String {
+        return "\(Int(fontSize))px"
+    }
+    
     func updateFont(_ font: String) {
         selectedFont = font
     }

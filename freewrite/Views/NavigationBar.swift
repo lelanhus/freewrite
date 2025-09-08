@@ -38,11 +38,8 @@ struct NavigationBar: View {
         HStack {
             // Font buttons (left side)
             FontControls(
-                fontSize: $typographyState.fontSize,
-                selectedFont: $typographyState.selectedFont,
-                hoveredFont: $hoverState.hoveredFont,
-                isHoveringSize: $hoverState.isHoveringSize,
-                isHoveringBottomNav: $hoverState.isHoveringBottomNav
+                typographyState: typographyState,
+                hoverState: hoverState
             )
             
             Spacer()
