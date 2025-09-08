@@ -23,12 +23,12 @@
 **Reasoning:** Multiple async operations could modify cache simultaneously  
 **Status:** 🔄
 
-### C02 🔴 Memory Leak in ConstrainedTextEditor
+### C02 ✅ Memory Leak in ConstrainedTextEditor
 **File:** `ConstrainedTextEditor.swift:21-26`  
 **Issue:** NotificationCenter observer never removed  
 **Fix:** Implement proper cleanup in onDisappear or deinit  
 **Reasoning:** Will accumulate observers causing memory growth  
-**Status:** 🔄
+**Status:** ✅ **RESOLVED** - Added proper Combine-based subscription lifecycle management
 
 ### C03 🔴 Force Unwrapping in ContentView
 **File:** `ContentView.swift:26`  

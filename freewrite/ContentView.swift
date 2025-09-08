@@ -1,4 +1,5 @@
 import SwiftUI
+import Combine
 
 struct ContentView: View {
     // Services (initialized safely)
@@ -15,6 +16,7 @@ struct ContentView: View {
     @State private var uiState = UIStateManager()
     @State private var hoverState = HoverStateManager()
     @State private var typographyState = TypographyStateManager()
+    @State private var timerCancellable: AnyCancellable?
     
     @AppStorage("colorScheme") private var colorSchemeString: String = "light"
     
@@ -149,18 +151,10 @@ struct ContentView: View {
                 await setupInitialState()
             }
             uiState.placeholderText = PlaceholderConstants.random()
+            setupTimerSubscription()
         }
-        .onReceive(Timer.publish(every: 1, on: .main, in: .common).autoconnect()) { _ in
-            // Handle timer updates - make bottom nav disappear when timer is running
-            if timerService.isRunning && !hoverState.isHoveringBottomNav {
-                withAnimation(.easeIn(duration: 1.0)) {
-                    uiState.bottomNavOpacity = 0.0
-                }
-            } else if !timerService.isRunning {
-                withAnimation(.easeOut(duration: 0.2)) {
-                    uiState.bottomNavOpacity = 1.0
-                }
-            }
+        .onDisappear {
+            cleanupTimerSubscription()
         }
         .onReceive(NotificationCenter.default.publisher(for: NSWindow.willEnterFullScreenNotification)) { _ in
             uiState.isFullscreen = true
@@ -312,6 +306,30 @@ struct ContentView: View {
     private func copyPromptToClipboard() {
         let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
         aiService.copyPromptToClipboard(with: trimmedText)
+    }
+    
+    // MARK: - Timer Subscription Management
+    
+    private func setupTimerSubscription() {
+        timerCancellable = Timer.publish(every: 1, on: .main, in: .common)
+            .autoconnect()
+            .sink { _ in
+                // Handle timer updates - make bottom nav disappear when timer is running
+                if timerService.isRunning && !hoverState.isHoveringBottomNav {
+                    withAnimation(.easeIn(duration: 1.0)) {
+                        uiState.bottomNavOpacity = 0.0
+                    }
+                } else if !timerService.isRunning {
+                    withAnimation(.easeOut(duration: 0.2)) {
+                        uiState.bottomNavOpacity = 1.0
+                    }
+                }
+            }
+    }
+    
+    private func cleanupTimerSubscription() {
+        timerCancellable?.cancel()
+        timerCancellable = nil
     }
 }
 
