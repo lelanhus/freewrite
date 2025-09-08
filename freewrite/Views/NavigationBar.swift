@@ -21,6 +21,9 @@ struct NavigationBar: View {
     let onOpenClaude: () -> Void
     let onCopyPrompt: () -> Void
     
+    // Event Monitor Management
+    @State private var scrollEventMonitor: Any?
+    
     var fontSizeButtonTitle: String {
         return "\(Int(typographyState.fontSize))px"
     }
@@ -66,23 +69,10 @@ struct NavigationBar: View {
                     }
                 }
                 .onAppear {
-                    // Add scroll wheel event monitoring for timer adjustment
-                    NSEvent.addLocalMonitorForEvents(matching: .scrollWheel) { event in
-                        if hoverState.isHoveringTimer {
-                            let scrollBuffer = event.deltaY * 0.25
-                            
-                            if abs(scrollBuffer) >= 0.1 {
-                                let currentMinutes = timerService.timeRemaining / 60
-                                NSHapticFeedbackManager.defaultPerformer.perform(.generic, performanceTime: .now)
-                                let direction = -scrollBuffer > 0 ? 5 : -5
-                                let newMinutes = currentMinutes + direction
-                                let roundedMinutes = (newMinutes / 5) * 5
-                                let newTime = roundedMinutes * 60
-                                timerService.setTime(min(max(newTime, 0), 2700)) // 0 to 45 minutes
-                            }
-                        }
-                        return event
-                    }
+                    setupScrollEventMonitor()
+                }
+                .onDisappear {
+                    cleanupScrollEventMonitor()
                 }
                 
                 Text("•").foregroundColor(FreewriteColors.separator)
@@ -201,6 +191,35 @@ struct NavigationBar: View {
         .background(FreewriteColors.navigationBackground)
         .onHover { hovering in
             hoverState.isHoveringBottomNav = hovering
+        }
+    }
+    
+    // MARK: - Event Monitor Management
+    
+    private func setupScrollEventMonitor() {
+        // Store the monitor reference for proper cleanup
+        scrollEventMonitor = NSEvent.addLocalMonitorForEvents(matching: .scrollWheel) { event in
+            if hoverState.isHoveringTimer {
+                let scrollBuffer = event.deltaY * 0.25
+                
+                if abs(scrollBuffer) >= 0.1 {
+                    let currentMinutes = timerService.timeRemaining / 60
+                    NSHapticFeedbackManager.defaultPerformer.perform(.generic, performanceTime: .now)
+                    let direction = -scrollBuffer > 0 ? 5 : -5
+                    let newMinutes = currentMinutes + direction
+                    let roundedMinutes = (newMinutes / 5) * 5
+                    let newTime = roundedMinutes * 60
+                    timerService.setTime(min(max(newTime, 0), 2700)) // 0 to 45 minutes
+                }
+            }
+            return event
+        }
+    }
+    
+    private func cleanupScrollEventMonitor() {
+        if let monitor = scrollEventMonitor {
+            NSEvent.removeMonitor(monitor)
+            scrollEventMonitor = nil
         }
     }
 }
