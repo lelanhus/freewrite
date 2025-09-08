@@ -134,29 +134,149 @@ extension DIContainer {
 
 // MARK: - Mock Service Placeholders (to be implemented in Tests/Mocks)
 
+@MainActor
 final class MockFileManagementService: @unchecked Sendable, FileManagementServiceProtocol {
-    func createNewEntry() async throws -> WritingEntryDTO { fatalError("Mock not implemented") }
-    func loadEntry(_ entryId: UUID) async throws -> String { fatalError("Mock not implemented") }
-    func saveEntry(_ entryId: UUID, content: String) async throws { fatalError("Mock not implemented") }
-    func deleteEntry(_ entryId: UUID) async throws { fatalError("Mock not implemented") }
-    func loadAllEntries() async throws -> [WritingEntryDTO] { fatalError("Mock not implemented") }
-    func updatePreviewText(_ entryId: UUID) async throws { fatalError("Mock not implemented") }
-    func getDocumentsDirectory() -> URL { fatalError("Mock not implemented") }
-    func entryExists(_ entryId: UUID) async -> Bool { fatalError("Mock not implemented") }
+    private var mockEntries: [UUID: WritingEntryDTO] = [:]
+    private var mockContents: [UUID: String] = [:]
+    var shouldFailOperations = false
+    var operationDelay: TimeInterval = 0
+    
+    func createNewEntry() async throws -> WritingEntryDTO {
+        if shouldFailOperations { throw FreewriteError.fileOperationFailed("Mock failure") }
+        if operationDelay > 0 { try await Task.sleep(nanoseconds: UInt64(operationDelay * 1_000_000_000)) }
+        
+        let entry = WritingEntryDTO(
+            id: UUID(),
+            filename: "mock-entry-\(Date().timeIntervalSince1970).md",
+            displayDate: "Mock Date",
+            previewText: "",
+            wordCount: 0,
+            isWelcomeEntry: false,
+            createdAt: Date(),
+            modifiedAt: Date()
+        )
+        mockEntries[entry.id] = entry
+        mockContents[entry.id] = FreewriteConstants.headerString
+        return entry
+    }
+    
+    func loadEntry(_ entryId: UUID) async throws -> String {
+        if shouldFailOperations { throw FreewriteError.fileOperationFailed("Mock load failure") }
+        if operationDelay > 0 { try await Task.sleep(nanoseconds: UInt64(operationDelay * 1_000_000_000)) }
+        
+        guard let content = mockContents[entryId] else { throw FreewriteError.entryNotFound }
+        return content
+    }
+    
+    func saveEntry(_ entryId: UUID, content: String) async throws {
+        if shouldFailOperations { throw FreewriteError.fileOperationFailed("Mock save failure") }
+        if operationDelay > 0 { try await Task.sleep(nanoseconds: UInt64(operationDelay * 1_000_000_000)) }
+        
+        guard let existingEntry = mockEntries[entryId] else { throw FreewriteError.entryNotFound }
+        mockContents[entryId] = content
+        
+        // Create updated entry with new modification date (immutable struct)
+        let updatedEntry = WritingEntryDTO(
+            id: existingEntry.id,
+            filename: existingEntry.filename,
+            displayDate: existingEntry.displayDate,
+            previewText: String(content.prefix(30)),
+            wordCount: content.split(separator: " ").count,
+            isWelcomeEntry: existingEntry.isWelcomeEntry,
+            createdAt: existingEntry.createdAt,
+            modifiedAt: Date()
+        )
+        mockEntries[entryId] = updatedEntry
+    }
+    
+    func deleteEntry(_ entryId: UUID) async throws {
+        if shouldFailOperations { throw FreewriteError.fileOperationFailed("Mock delete failure") }
+        if operationDelay > 0 { try await Task.sleep(nanoseconds: UInt64(operationDelay * 1_000_000_000)) }
+        
+        guard mockEntries[entryId] != nil else { throw FreewriteError.entryNotFound }
+        mockEntries.removeValue(forKey: entryId)
+        mockContents.removeValue(forKey: entryId)
+    }
+    
+    func loadAllEntries() async throws -> [WritingEntryDTO] {
+        if shouldFailOperations { throw FreewriteError.fileOperationFailed("Mock load all failure") }
+        if operationDelay > 0 { try await Task.sleep(nanoseconds: UInt64(operationDelay * 1_000_000_000)) }
+        
+        return Array(mockEntries.values).sorted { $0.createdAt > $1.createdAt }
+    }
+    
+    func updatePreviewText(_ entryId: UUID) async throws {
+        if shouldFailOperations { throw FreewriteError.fileOperationFailed("Mock update failure") }
+        // Mock implementation - no actual preview update needed
+    }
+    
+    func getDocumentsDirectory() -> URL {
+        return URL(fileURLWithPath: "/tmp/freewrite-mock")
+    }
+    
+    func entryExists(_ entryId: UUID) async -> Bool {
+        return mockEntries[entryId] != nil
+    }
 }
 
+@MainActor
 final class MockTimerService: @unchecked Sendable, TimerServiceProtocol {
-    var timeRemaining: Int = 0
-    var isRunning: Bool = false
-    var isFinished: Bool = false
-    var formattedTime: String = "0:00"
+    private(set) var timeRemaining: Int = 900
+    private(set) var isRunning: Bool = false
+    private(set) var isFinished: Bool = false
+    var shouldFailOperations = false
     
-    func start() {}
-    func pause() {}
-    func reset() {}
-    func reset(to duration: Int) {}
-    func adjustTime(by seconds: Int) {}
-    func setTime(_ seconds: Int) {}
+    var formattedTime: String {
+        let minutes = timeRemaining / 60
+        let seconds = timeRemaining % 60
+        return String(format: "%d:%02d", minutes, seconds)
+    }
+    
+    func start() {
+        guard !isRunning && timeRemaining > 0 else { return }
+        isRunning = true
+        isFinished = false
+    }
+    
+    func pause() {
+        guard isRunning else { return }
+        isRunning = false
+    }
+    
+    func reset() {
+        reset(to: 900)
+    }
+    
+    func reset(to duration: Int) {
+        timeRemaining = max(0, min(duration, 2700))
+        isRunning = false
+        isFinished = false
+    }
+    
+    func adjustTime(by seconds: Int) {
+        let newTime = timeRemaining + seconds
+        timeRemaining = max(0, min(newTime, 2700))
+        
+        if timeRemaining == 0 && isRunning {
+            isRunning = false
+            isFinished = true
+        }
+    }
+    
+    func setTime(_ seconds: Int) {
+        timeRemaining = max(0, min(seconds, 2700))
+        
+        if timeRemaining == 0 && isRunning {
+            isRunning = false
+            isFinished = true
+        }
+    }
+    
+    func handleScrollAdjustment(deltaY: CGFloat) {
+        let direction = deltaY > 0 ? 1 : -1
+        let adjustment = direction * 5 * 60 // 5 minutes
+        adjustTime(by: adjustment)
+    }
 }
 
 final class MockExportService: @unchecked Sendable, ExportServiceProtocol {
@@ -168,13 +288,52 @@ final class MockExportService: @unchecked Sendable, ExportServiceProtocol {
 
 @MainActor
 final class MockAIIntegrationService: @unchecked Sendable, AIIntegrationServiceProtocol {
-    func canShareViaURL(_ content: String) -> Bool { fatalError("Mock not implemented") }
-    func generateChatGPTURL(content: String, prompt: String?) throws -> URL { fatalError("Mock not implemented") }
-    func generateClaudeURL(content: String, prompt: String?) throws -> URL { fatalError("Mock not implemented") }
-    func createPromptForClipboard(content: String, prompt: String?) -> String { fatalError("Mock not implemented") }
-    func copyPromptToClipboard(content: String, prompt: String?) { fatalError("Mock not implemented") }
-    func openURL(_ url: URL) { fatalError("Mock not implemented") }
-    func openChatGPT(with content: String) async throws { fatalError("Mock not implemented") }
-    func openClaude(with content: String) async throws { fatalError("Mock not implemented") }
-    func copyPromptToClipboard(with content: String) { fatalError("Mock not implemented") }
+    var shouldFailOperations = false
+    private(set) var lastOpenedURL: URL?
+    private(set) var lastCopiedContent: String?
+    
+    func canShareViaURL(_ content: String) -> Bool {
+        return content.count < 2000 // Mock URL length limit
+    }
+    
+    func generateChatGPTURL(content: String, prompt: String?) throws -> URL {
+        if shouldFailOperations { throw FreewriteError.urlTooLong }
+        return URL(string: "https://chat.openai.com/?m=mock-content")!
+    }
+    
+    func generateClaudeURL(content: String, prompt: String?) throws -> URL {
+        if shouldFailOperations { throw FreewriteError.urlTooLong }
+        return URL(string: "https://claude.ai/new?q=mock-content")!
+    }
+    
+    func createPromptForClipboard(content: String, prompt: String?) -> String {
+        let fullPrompt = prompt ?? "Mock prompt"
+        return "\(fullPrompt)\n\n\(content)"
+    }
+    
+    func copyPromptToClipboard(content: String, prompt: String?) {
+        lastCopiedContent = createPromptForClipboard(content: content, prompt: prompt)
+        // Mock clipboard operation - don't actually modify system clipboard
+    }
+    
+    func openURL(_ url: URL) {
+        lastOpenedURL = url
+        // Mock URL opening - don't actually open URLs in tests
+    }
+    
+    func openChatGPT(with content: String) async throws {
+        if shouldFailOperations { throw FreewriteError.urlTooLong }
+        let url = try generateChatGPTURL(content: content, prompt: nil)
+        openURL(url)
+    }
+    
+    func openClaude(with content: String) async throws {
+        if shouldFailOperations { throw FreewriteError.urlTooLong }
+        let url = try generateClaudeURL(content: content, prompt: nil)
+        openURL(url)
+    }
+    
+    func copyPromptToClipboard(with content: String) {
+        copyPromptToClipboard(content: content, prompt: nil)
+    }
 }
