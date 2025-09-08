@@ -532,10 +532,9 @@ final class FileManagementService: FileManagementServiceProtocol {
         )
         
         directoryMonitor?.setEventHandler { [weak self] in
-            // Directory changed - invalidate cache to force refresh on next access
+            // Directory changed - perform intelligent cache invalidation
             Task { @MainActor in
-                self?.invalidateCache()
-                print("Directory changed - cache invalidated")
+                await self?.handleDirectoryChange()
             }
         }
         
@@ -553,6 +552,52 @@ final class FileManagementService: FileManagementServiceProtocol {
         directoryMonitor = nil
         // Note: hasActiveMonitoring cannot be set from nonisolated context
         // This is acceptable since cleanup typically happens during deinit
+    }
+    
+    // MARK: - Enhanced Directory Change Handling
+    
+    private func handleDirectoryChange() async {
+        print("Directory change detected - performing intelligent cache invalidation")
+        
+        // Get current directory state for comparison
+        do {
+            let currentFiles = try FileManager().contentsOfDirectory(
+                at: documentsDirectory,
+                includingPropertiesForKeys: [.contentModificationDateKey]
+            ).filter { $0.pathExtension == FileSystemConstants.fileExtension }
+            
+            // Check for file modifications and invalidate specific content cache entries
+            await invalidateModifiedFileContent(currentFiles)
+            
+            // Always invalidate entry cache for directory structure changes
+            invalidateCache()
+            
+        } catch {
+            print("Warning: Could not check directory changes: \(error)")
+            // Fall back to full cache invalidation
+            invalidateCache()
+        }
+    }
+    
+    private func invalidateModifiedFileContent(_ currentFiles: [URL]) async {
+        for fileURL in currentFiles {
+            let filename = fileURL.lastPathComponent
+            
+            // Extract UUID from filename to check content cache
+            guard let uuidMatch = filename.range(of: "\\[(.*?)\\]", options: .regularExpression),
+                  let uuid = UUID(uuidString: String(filename[uuidMatch].dropFirst().dropLast())) else {
+                continue
+            }
+            
+            // Check if file was modified externally by comparing modification dates
+            if let fileModDate = getFileModificationDate(for: fileURL),
+               let cachedTimestamp = contentCacheTimestamp[uuid],
+               fileModDate > cachedTimestamp {
+                // File was modified externally - invalidate its content cache
+                removeContentCache(uuid)
+                print("Invalidated content cache for externally modified file: \(filename)")
+            }
+        }
     }
     
     deinit {
