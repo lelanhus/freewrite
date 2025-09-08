@@ -7,13 +7,30 @@ import AppKit
 final class PDFExportService: ExportServiceProtocol {
     private let fileService: FileManagementServiceProtocol
     
+    // Background queue for heavy PDF generation to prevent UI blocking
+    private let exportQueue = DispatchQueue(
+        label: "freewrite.pdfexport",
+        qos: .userInitiated
+    )
+    
     init(fileService: FileManagementServiceProtocol) {
         self.fileService = fileService
     }
     
     func exportToPDF(entryId: UUID, settings: PDFExportSettings) async throws -> Data {
         let content = try await fileService.loadEntry(entryId)
-        return try createPDFFromText(content, settings: settings)
+        
+        // Move heavy PDF generation to background queue to prevent UI blocking
+        return try await withCheckedThrowingContinuation { continuation in
+            exportQueue.async {
+                do {
+                    let pdfData = try self.createPDFFromTextSync(content, settings: settings)
+                    continuation.resume(returning: pdfData)
+                } catch {
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
     }
     
     func exportToText(entryId: UUID) async throws -> String {
@@ -40,7 +57,7 @@ final class PDFExportService: ExportServiceProtocol {
     
     // MARK: - Private Methods
     
-    private func createPDFFromText(_ text: String, settings: PDFExportSettings) throws -> Data {
+    nonisolated private func createPDFFromTextSync(_ text: String, settings: PDFExportSettings) throws -> Data {
         // Letter size page dimensions
         let pageWidth: CGFloat = 612.0  // 8.5 x 72
         let pageHeight: CGFloat = 792.0 // 11 x 72
