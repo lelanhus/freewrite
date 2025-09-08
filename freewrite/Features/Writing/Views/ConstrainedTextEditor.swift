@@ -156,6 +156,28 @@ struct FreewriteTextEditor: NSViewRepresentable {
             }
         }
     }
+    
+    func dismantleNSView(_ scrollView: NSScrollView, context: Context) {
+        // Proper cleanup of AppKit resources to prevent memory leaks
+        guard let textView = scrollView.documentView as? NSTextView else { return }
+        
+        // Clear delegates and references that could cause retention cycles
+        textView.delegate = nil
+        
+        // Clear text storage and layout manager references
+        if let layoutManager = textView.textContainer?.layoutManager,
+           let _ = textView.textContainer {
+            layoutManager.removeTextContainer(at: 0) // Remove by index
+        }
+        
+        // Clear the text content to release any retained strings
+        textView.string = ""
+        
+        // Remove from scroll view
+        scrollView.documentView = nil
+        
+        print("Cleaned up NSTextView resources")
+    }
 }
 
 // MARK: - Key Event Handling Extension
