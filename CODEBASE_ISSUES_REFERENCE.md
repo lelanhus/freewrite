@@ -128,12 +128,12 @@
 **Reasoning:** Stale cache could serve deleted/corrupted entries  
 **Status:** 🔄
 
-### C17 🔴 NSTextView Memory Leak
+### C17 ✅ NSTextView Memory Leak
 **File:** `ConstrainedTextEditor.swift:119-177`  
 **Issue:** NSTextView delegate/observer cleanup missing  
 **Fix:** Implement proper NSViewRepresentable cleanup  
 **Reasoning:** AppKit views require explicit cleanup  
-**Status:** 🔄
+**Status:** ✅ **RESOLVED** - Added dismantleNSView with proper AppKit resource cleanup
 
 ### C18 🔴 Preview Generation Crash
 **File:** `ContentView.swift:198-200`  
@@ -648,12 +648,12 @@
 
 ## Fix Progress Tracking
 
-**Critical Issues Fixed:** 4/19 (C02✅ C07✅ C08✅ C13✅)  
+**Critical Issues Fixed:** 6/19 (C02✅ C04✅ C07✅ C08✅ C13✅ C17✅)  
 **High Issues Fixed:** 0/23  
 **Medium Issues Fixed:** 0/31  
 **Low Issues Fixed:** 0/15  
 
-**Overall Progress:** 4/88 (5%)
+**Overall Progress:** 6/88 (7%)
 
 ---
 

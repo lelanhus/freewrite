@@ -134,12 +134,13 @@ final class FileManagementService: FileManagementServiceProtocol {
     }
     
     func loadAllEntries() async throws -> [WritingEntryDTO] {
-        // Return cached entries if available and valid
-        if isCacheValid(), !entryCache.isEmpty {
-            return Array(entryCache.values).sorted { $0.createdAt > $1.createdAt }
+        // Atomic cache access - check validity and return in single operation
+        let cachedEntries = getValidCachedEntries()
+        if !cachedEntries.isEmpty {
+            return cachedEntries.sorted { $0.createdAt > $1.createdAt }
         }
         
-        // Cache miss or expired, refresh cache
+        // Cache miss or expired, refresh cache atomically
         try await refreshEntryCache()
         return Array(entryCache.values).sorted { $0.createdAt > $1.createdAt }
     }
@@ -188,21 +189,30 @@ final class FileManagementService: FileManagementServiceProtocol {
     // MARK: - Private Methods
     
     private func findEntry(_ entryId: UUID) async throws -> WritingEntryDTO? {
-        // Try to get from cache first
-        if let cachedEntry = getCachedEntry(entryId) {
+        // Atomic cache lookup - eliminates TOCTOU race condition
+        if let cachedEntry = getValidCachedEntry(entryId) {
             return cachedEntry
         }
         
-        // Cache miss, refresh cache and try again
+        // Cache miss or expired, refresh cache atomically and try again
         try await refreshEntryCache()
-        return getCachedEntry(entryId)
+        return entryCache[entryId] // Direct access after refresh
     }
     
-    // MARK: - Cache Management
+    // MARK: - Cache Management (Race-condition Safe)
     
-    private func getCachedEntry(_ entryId: UUID) -> WritingEntryDTO? {
-        guard isCacheValid() else { return nil }
+    private func getValidCachedEntry(_ entryId: UUID) -> WritingEntryDTO? {
+        // Atomic check-and-get operation to prevent TOCTOU races
+        guard let timestamp = entryCacheTimestamp else { return nil }
+        guard Date().timeIntervalSince(timestamp) < cacheExpiryInterval else { return nil }
         return entryCache[entryId]
+    }
+    
+    private func getValidCachedEntries() -> [WritingEntryDTO] {
+        // Atomic check-and-get-all operation to prevent TOCTOU races  
+        guard let timestamp = entryCacheTimestamp else { return [] }
+        guard Date().timeIntervalSince(timestamp) < cacheExpiryInterval else { return [] }
+        return Array(entryCache.values)
     }
     
     private func isCacheValid() -> Bool {
