@@ -17,6 +17,11 @@ final class FileManagementService: FileManagementServiceProtocol {
     private var entryCacheTimestamp: Date?
     private let cacheExpiryInterval: TimeInterval = 30.0 // 30 seconds
     
+    // Content caching to eliminate redundant file reads
+    private var contentCache: [UUID: String] = [:]
+    private var contentCacheTimestamp: [UUID: Date] = [:]
+    private let contentCacheExpiryInterval: TimeInterval = 60.0 // 1 minute
+    
     // File operation coordination to prevent corruption
     private var activeSaveOperations: Set<UUID> = []
     
@@ -101,6 +106,12 @@ final class FileManagementService: FileManagementServiceProtocol {
     }
     
     func loadEntry(_ entryId: UUID) async throws -> String {
+        // Check content cache first to eliminate redundant file reads
+        if let cachedContent = getValidCachedContent(entryId) {
+            print("Content cache hit for entry: \(entryId)")
+            return cachedContent
+        }
+        
         guard let entry = try await findEntry(entryId) else {
             throw FreewriteError.entryNotFound
         }
@@ -108,7 +119,7 @@ final class FileManagementService: FileManagementServiceProtocol {
         let fileURL = documentsDirectory.appendingPathComponent(entry.filename)
         
         // Move file reading to background queue to prevent UI blocking
-        return try await withCheckedThrowingContinuation { continuation in
+        let content = try await withCheckedThrowingContinuation { continuation in
             fileOperationQueue.async {
                 do {
                     let content = try String(contentsOf: fileURL, encoding: .utf8)
@@ -119,6 +130,10 @@ final class FileManagementService: FileManagementServiceProtocol {
                 }
             }
         }
+        
+        // Cache the content to prevent redundant reads
+        cacheContent(entryId, content: content)
+        return content
     }
     
     func saveEntry(_ entryId: UUID, content: String) async throws {
@@ -162,6 +177,9 @@ final class FileManagementService: FileManagementServiceProtocol {
                             modifiedAt: Date()
                         )
                         self.updateCacheEntry(updatedEntry)
+                        
+                        // Update content cache with new content
+                        self.cacheContent(entry.id, content: content)
                         
                         print("Saved entry: \(entry.filename)")
                         continuation.resume()
@@ -317,6 +335,9 @@ final class FileManagementService: FileManagementServiceProtocol {
         // Atomic invalidation - timestamp and entries must be consistent
         entryCacheTimestamp = nil
         entryCache.removeAll()
+        
+        // Also invalidate content cache when entry cache is invalidated
+        invalidateContentCache()
     }
     
     private func updateCacheEntry(_ entry: WritingEntryDTO) {
@@ -331,6 +352,39 @@ final class FileManagementService: FileManagementServiceProtocol {
         if entryCacheTimestamp != nil {
             entryCache.removeValue(forKey: entryId)
         }
+        // Also remove from content cache
+        removeContentCache(entryId)
+    }
+    
+    // MARK: - Content Cache Management
+    
+    private func getValidCachedContent(_ entryId: UUID) -> String? {
+        guard let content = contentCache[entryId],
+              let timestamp = contentCacheTimestamp[entryId] else { return nil }
+        
+        // Check if content cache is still valid
+        guard Date().timeIntervalSince(timestamp) < contentCacheExpiryInterval else {
+            // Cache expired, remove it
+            removeContentCache(entryId)
+            return nil
+        }
+        
+        return content
+    }
+    
+    private func cacheContent(_ entryId: UUID, content: String) {
+        contentCache[entryId] = content
+        contentCacheTimestamp[entryId] = Date()
+    }
+    
+    private func removeContentCache(_ entryId: UUID) {
+        contentCache.removeValue(forKey: entryId)
+        contentCacheTimestamp.removeValue(forKey: entryId)
+    }
+    
+    private func invalidateContentCache() {
+        contentCache.removeAll()
+        contentCacheTimestamp.removeAll()
     }
     
     private func processEntryFiles(_ fileURLs: [URL]) async throws -> [WritingEntryDTO] {
@@ -391,11 +445,16 @@ final class FileManagementService: FileManagementServiceProtocol {
             throw FreewriteError.invalidEntryFormat
         }
         
-        // Read content for preview
+        // Read content for preview and cache it to eliminate redundant reads
         let content = try String(contentsOf: fileURL, encoding: .utf8)
         let previewText = extractPreviewText(from: content)
         let wordCount = calculateWordCount(content)
         let isWelcomeEntry = content.contains("Welcome to Freewrite")
+        
+        // Cache content since we already read it for metadata
+        await MainActor.run {
+            cacheContent(uuid, content: content)
+        }
         
         // Format display date
         let displayDate = DateFormatter.entryFormatter.string(from: fileDate)
