@@ -6,6 +6,9 @@ struct NavigationBar: View {
     @Bindable var hoverState: HoverStateManager
     @Bindable var uiState: UIStateManager
     
+    // Shortcut disclosure system
+    let disclosureManager: ShortcutDisclosureManager
+    
     // Essential bindings that can't be in managers
     @Binding var text: String
     
@@ -65,6 +68,10 @@ struct NavigationBar: View {
                         NSCursor.pop()
                     }
                 }
+                .shortcutTooltip(
+                    element: "timer", 
+                    disclosureManager: disclosureManager
+                )
                 .onAppear {
                     setupScrollEventMonitor()
                 }
@@ -156,6 +163,10 @@ struct NavigationBar: View {
                         NSCursor.pop()
                     }
                 }
+                .shortcutTooltip(
+                    element: "newEntry",
+                    disclosureManager: disclosureManager
+                )
                 
                 Text("•").foregroundColor(FreewriteColors.separator)
                 

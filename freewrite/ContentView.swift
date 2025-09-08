@@ -18,6 +18,8 @@ struct ContentView: View {
     @State private var typographyState = TypographyStateManager()
     @State private var progressState = ProgressStateManager()
     @State private var errorManager = ErrorManager()
+    @State private var keyboardManager = KeyboardShortcutManager()
+    @State private var disclosureManager = ShortcutDisclosureManager()
     @State private var timerCancellable: AnyCancellable?
     @State private var fullscreenCancellables = Set<AnyCancellable>()
     
@@ -144,6 +146,7 @@ struct ContentView: View {
                         typographyState: typographyState,
                         hoverState: hoverState,
                         uiState: uiState,
+                        disclosureManager: disclosureManager,
                         text: $text,
                         timerService: timerService,
                         colorScheme: colorScheme,
@@ -212,11 +215,15 @@ struct ContentView: View {
             uiState.placeholderText = PlaceholderConstants.random()
             setupTimerSubscription()
             setupFullscreenSubscriptions()
+            setupKeyboardShortcuts()
             
             // Setup hover state coordination to prevent pollution
             uiState.notifyHoverStateReset = { [weak hoverState] in
                 hoverState?.resetAllHover()
             }
+            
+            // Register session start for shortcut learning
+            disclosureManager.registerSessionStart()
         }
         .onDisappear {
             cleanupTimerSubscription()
@@ -456,6 +463,67 @@ struct ContentView: View {
     
     private func cleanupFullscreenSubscriptions() {
         fullscreenCancellables.removeAll()
+    }
+    
+    // MARK: - Keyboard Shortcut Management
+    
+    private func setupKeyboardShortcuts() {
+        // Setup global keyboard monitoring for shortcuts
+        NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
+            let handled = keyboardManager.handleKeyEvent(event)
+            return handled ? nil : event // Return nil if handled, event if not
+        }
+        
+        // Essential flow shortcuts
+        keyboardManager.onNewSession = {
+            Task { await createNewEntry() }
+            disclosureManager.registerShortcutUsed("⌘N")
+        }
+        
+        keyboardManager.onTimerToggle = {
+            if timerService.isRunning {
+                timerService.pause()
+            } else {
+                timerService.start()
+            }
+            disclosureManager.registerShortcutUsed("⌘T")
+        }
+        
+        keyboardManager.onToggleDistractionFree = {
+            // Toggle all UI elements for pure writing focus
+            withAnimation(.easeInOut(duration: 0.3)) {
+                uiState.bottomNavOpacity = uiState.bottomNavOpacity > 0 ? 0.0 : 1.0
+            }
+            disclosureManager.registerShortcutUsed("⌘D")
+        }
+        
+        keyboardManager.onTimerPreset = { minutes in
+            timerService.reset(to: minutes * 60) // Convert to seconds
+            disclosureManager.registerShortcutUsed("⌘\(minutes/5)")
+        }
+        
+        keyboardManager.onExportForAI = {
+            copyPromptToClipboard()
+            disclosureManager.registerShortcutUsed("⌘E")
+        }
+        
+        keyboardManager.onToggleSidebar = {
+            withAnimation(.easeInOut(duration: 0.2)) {
+                uiState.showingSidebar.toggle()
+            }
+            disclosureManager.registerShortcutUsed("⌘O")
+        }
+        
+        keyboardManager.onConstraintViolation = { message in
+            // Provide gentle feedback for blocked shortcuts
+            print("Shortcut blocked: \(message)")
+            // Could show subtle UI feedback here
+        }
+        
+        keyboardManager.onConstrainedPaste = {
+            // Handle paste with freewriting constraints
+            // Implementation would go here
+        }
     }
 }
 

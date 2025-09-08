@@ -22,6 +22,7 @@
 		40978D4D9636F15D69883052 /* OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = 87EA0B0E53A9285554C87559 /* OFL.txt */; };
 		4CC7E84A5EC1373EFC46DD28 /* Lato-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DCF11E472E74AF5F610730E1 /* Lato-Regular.ttf */; };
 		4CFF7BC546E168A372BBB213 /* ErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65FEF6F8EF42BF77B7B2F656 /* ErrorHandling.swift */; };
+		556E5BBD49D5DFFEF8C8542E /* ShortcutDisclosureSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27256D11A76DB2818E0D81DB /* ShortcutDisclosureSystem.swift */; };
 		6052C9E6762D478418B980AD /* AIIntegrationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69295D906BBEFD2FE6773AF2 /* AIIntegrationService.swift */; };
 		6B3BD5CADC66EC26D84C23E3 /* FreewriteTimerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A98C6B66F035C0530B93E63 /* FreewriteTimerTests.swift */; };
 		74C2183235442328CEA34244 /* Lato-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7CE1C429577B25F2C145616E /* Lato-Italic.ttf */; };
@@ -51,6 +52,7 @@
 		E3DE0287F6C01B867CFB7D8D /* Lato-Thin.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 129573019EF9A9DB6D56EE20 /* Lato-Thin.ttf */; };
 		E4D30B07BEDF2968966CD2DB /* DTOs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F0466EB82402087B49C8D74 /* DTOs.swift */; };
 		EC2E6FE766115AA06F55C7F1 /* freewriteTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFC435D41326C9A4D20FDD5C /* freewriteTests.swift */; };
+		F906E1A229CB7E1CF08BC12B /* KeyboardShortcutManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1064FF11A1816F6F1EC88071 /* KeyboardShortcutManager.swift */; };
 		FF09D0A48EBF3AA326EED601 /* ScrollableTimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F74AE4FDD163B3A90C11F892 /* ScrollableTimerView.swift */; };
 /* End PBXBuildFile section */
 
@@ -72,10 +74,12 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		1064FF11A1816F6F1EC88071 /* KeyboardShortcutManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardShortcutManager.swift; sourceTree = "<group>"; };
 		129573019EF9A9DB6D56EE20 /* Lato-Thin.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-Thin.ttf"; sourceTree = "<group>"; };
 		137C6730D72BD223A9825C92 /* FileManagementService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileManagementService.swift; sourceTree = "<group>"; };
 		14478E4E33268780C5F0DC24 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		1C190C743F912C6C03AF19F5 /* Lato-BoldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-BoldItalic.ttf"; sourceTree = "<group>"; };
+		27256D11A76DB2818E0D81DB /* ShortcutDisclosureSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutDisclosureSystem.swift; sourceTree = "<group>"; };
 		2AA059BA6ABF7B6A39C7E82A /* DIContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DIContainer.swift; sourceTree = "<group>"; };
 		330EF686043D4852B071BDE4 /* NavigationBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBar.swift; sourceTree = "<group>"; };
 		347C52F9AB41701D2A1C848B /* Lato-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-Light.ttf"; sourceTree = "<group>"; };
@@ -337,6 +341,7 @@
 				14478E4E33268780C5F0DC24 /* Constants.swift */,
 				4F0466EB82402087B49C8D74 /* DTOs.swift */,
 				65FEF6F8EF42BF77B7B2F656 /* ErrorHandling.swift */,
+				27256D11A76DB2818E0D81DB /* ShortcutDisclosureSystem.swift */,
 				BDF7F78E5A076C9D0F12DAEA /* StateManagers.swift */,
 			);
 			path = Models;
@@ -385,6 +390,7 @@
 			children = (
 				36379BE129346215AA2A6091 /* Implementations */,
 				5C37EAD5B07853C231E03DCD /* Protocols */,
+				1064FF11A1816F6F1EC88071 /* KeyboardShortcutManager.swift */,
 				7A36983D1491230FB30C541D /* TextConstraintValidator.swift */,
 			);
 			path = Services;
@@ -633,10 +639,12 @@
 				B2AF61E9490442FFCC6E6052 /* FileManagementServiceProtocol.swift in Sources */,
 				3D50860F25B38DA202850B87 /* FontControls.swift in Sources */,
 				1A1D9B2971D271AABA6989EC /* FreewriteTimer.swift in Sources */,
+				F906E1A229CB7E1CF08BC12B /* KeyboardShortcutManager.swift in Sources */,
 				9F91F06B1C3E9F3E58637EA6 /* NavigationBar.swift in Sources */,
 				9AA4265D99627686E3D3693B /* PDFExportService.swift in Sources */,
 				FF09D0A48EBF3AA326EED601 /* ScrollableTimerView.swift in Sources */,
 				1C59B187AE4A17750BE3EBD6 /* ServiceRegistry.swift in Sources */,
+				556E5BBD49D5DFFEF8C8542E /* ShortcutDisclosureSystem.swift in Sources */,
 				B8A1FA41CB18F78D40019A02 /* Sidebar.swift in Sources */,
 				3A71502540B3B3A51C5A797D /* StateManagers.swift in Sources */,
 				295EEF1E58DFCF4C1595720F /* TextConstraintValidator.swift in Sources */,
