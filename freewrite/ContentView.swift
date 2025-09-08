@@ -1,10 +1,10 @@
 import SwiftUI
 
 struct ContentView: View {
-    // Services
-    private let timerService = DIContainer.shared.resolve(TimerServiceProtocol.self) as! FreewriteTimer
-    private let fileService = DIContainer.shared.resolve(FileManagementServiceProtocol.self)
-    private let aiService = DIContainer.shared.resolve(AIIntegrationServiceProtocol.self)
+    // Services (initialized safely)
+    private let timerService: FreewriteTimer
+    private let fileService: FileManagementServiceProtocol
+    private let aiService: AIIntegrationServiceProtocol
     
     // Entry Management State
     @State private var entries: [WritingEntryDTO] = []
@@ -18,6 +18,19 @@ struct ContentView: View {
     
     @AppStorage("colorScheme") private var colorSchemeString: String = "light"
     
+    // MARK: - Initialization
+    
+    init() {
+        // Safe service resolution with proper error handling
+        do {
+            self.timerService = try DIContainer.shared.resolveSafe(TimerServiceProtocol.self) as! FreewriteTimer
+            self.fileService = try DIContainer.shared.resolveSafe(FileManagementServiceProtocol.self)
+            self.aiService = try DIContainer.shared.resolveSafe(AIIntegrationServiceProtocol.self)
+        } catch {
+            fatalError("Failed to resolve services: \(error). Ensure DIContainer.configure() is called before creating ContentView.")
+        }
+    }
+    
     // Computed properties
     private var colorScheme: ColorScheme {
         return colorSchemeString == "dark" ? .dark : .light
@@ -26,8 +39,6 @@ struct ContentView: View {
     
     var body: some View {
         let navHeight: CGFloat = 68
-        let _ = FreewriteColors.navigationText // TODO: Remove after migration to components
-        let _ = FreewriteColors.navigationTextHover // TODO: Remove after migration to components
         
         HStack(spacing: 0) {
             // Main content - matching original structure exactly
@@ -75,22 +86,10 @@ struct ContentView: View {
                 VStack {
                     Spacer()
                     NavigationBar(
-                        fontSize: $typographyState.fontSize,
-                        selectedFont: $typographyState.selectedFont,
-                        hoveredFont: $hoverState.hoveredFont,
-                        isHoveringSize: $hoverState.isHoveringSize,
-                        isHoveringTimer: $hoverState.isHoveringTimer,
-                        isHoveringChat: $hoverState.isHoveringChat,
-                        isHoveringThemeToggle: $hoverState.isHoveringThemeToggle,
-                        isHoveringFullscreen: $hoverState.isHoveringFullscreen,
-                        isHoveringNewEntry: $hoverState.isHoveringNewEntry,
-                        isHoveringClock: $hoverState.isHoveringClock,
-                        isHoveringBottomNav: $hoverState.isHoveringBottomNav,
-                        showingChatMenu: $uiState.showingChatMenu,
-                        didCopyPrompt: $uiState.didCopyPrompt,
-                        showingSidebar: $uiState.showingSidebar,
+                        typographyState: typographyState,
+                        hoverState: hoverState,
+                        uiState: uiState,
                         colorSchemeString: $colorSchemeString,
-                        isFullscreen: $uiState.isFullscreen,
                         text: $text,
                         timerService: timerService,
                         colorScheme: colorScheme,
@@ -181,25 +180,17 @@ struct ContentView: View {
     // MARK: - Text Management
     
     private func processTextChange(_ newValue: String) {
-        // Only apply constraints for actual deletions/edits, allow forward typing
-        let currentTextContent = text.dropFirst(2) // Content after "\n\n"
-        let newTextContent = newValue.dropFirst(2) // Content after "\n\n" 
+        let validationResult = TextConstraintValidator.validateSimpleTextChange(
+            newText: newValue,
+            currentText: text
+        )
         
-        // Check if user is trying to delete/edit existing content
-        if newValue.count >= 2 && newTextContent.count < currentTextContent.count {
-            NSSound.beep()
+        if validationResult.shouldProvideFeedback {
+            TextConstraintValidator.provideFeedback()
             return
         }
         
-        // Ensure the text always starts with two newlines
-        let processedValue: String
-        if !newValue.hasPrefix("\n\n") {
-            processedValue = "\n\n" + newValue.trimmingCharacters(in: .newlines)
-        } else {
-            processedValue = newValue
-        }
-        
-        text = processedValue
+        text = validationResult.correctedText ?? newValue
         
         // Auto-save with file service
         Task {

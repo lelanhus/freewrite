@@ -20,18 +20,6 @@ final class DIContainer: Sendable {
         isConfigured = true
     }
     
-    /// Resolves a service instance
-    /// - Parameter type: The service type to resolve
-    /// - Returns: Service instance
-    /// - Throws: Fatal error if service is not registered (legacy - being phased out)
-    func resolve<T>(_ type: T.Type) -> T {
-        guard let service = services.resolve(type) else {
-            // TODO: Replace all call sites with resolveSafe and remove this method
-            fatalError("Service \(type) not registered. Make sure DIContainer.configure() is called.")
-        }
-        return service
-    }
-    
     /// Safe resolve method that throws instead of crashing
     /// - Parameter type: The service type to resolve
     /// - Returns: Service instance

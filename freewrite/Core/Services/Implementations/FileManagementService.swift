@@ -283,7 +283,7 @@ final class FileManagementService: FileManagementServiceProtocol {
             wordCount: wordCount,
             isWelcomeEntry: isWelcomeEntry,
             createdAt: fileDate,
-            modifiedAt: fileDate // TODO: Get actual modification date
+            modifiedAt: getFileModificationDate(for: fileURL) ?? fileDate
         )
     }
     
@@ -301,5 +301,15 @@ final class FileManagementService: FileManagementServiceProtocol {
         return trimmed.isEmpty ? 0 : 
             trimmed.components(separatedBy: .whitespacesAndNewlines)
                    .filter { !$0.isEmpty }.count
+    }
+    
+    private func getFileModificationDate(for fileURL: URL) -> Date? {
+        do {
+            let attributes = try fileManager.attributesOfItem(atPath: fileURL.path)
+            return attributes[.modificationDate] as? Date
+        } catch {
+            print("Warning: Could not get modification date for \(fileURL.lastPathComponent): \(error)")
+            return nil
+        }
     }
 }

@@ -14,6 +14,7 @@
 		1A1D9B2971D271AABA6989EC /* FreewriteTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 875F016C37F8E7BDCD41B92C /* FreewriteTimer.swift */; };
 		1B1B1204C6DA54BEFD0EFBEE /* ConstrainedTextEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF35EA7FBE37DC8D5C577FF /* ConstrainedTextEditor.swift */; };
 		1C59B187AE4A17750BE3EBD6 /* ServiceRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EF277EF381D8A79886DA5F /* ServiceRegistry.swift */; };
+		295EEF1E58DFCF4C1595720F /* TextConstraintValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A36983D1491230FB30C541D /* TextConstraintValidator.swift */; };
 		36A444366E90A73B32A9ECDA /* ChatMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 491FC192C28DBF1ED4D554F9 /* ChatMenu.swift */; };
 		38AAFADFCB4A0CE0425CCF5B /* Lato-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1C190C743F912C6C03AF19F5 /* Lato-BoldItalic.ttf */; };
 		3A71502540B3B3A51C5A797D /* StateManagers.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDF7F78E5A076C9D0F12DAEA /* StateManagers.swift */; };
@@ -37,7 +38,6 @@
 		B44AE41982AE792976176ED2 /* ContentView+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBC26B080809717E5D4A55D /* ContentView+Extensions.swift */; };
 		B4FB153F8F5946D069AC8056 /* Lato-LightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C09265D9DDAFBA94379F65FD /* Lato-LightItalic.ttf */; };
 		B5E93939515194CC946BA23B /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B941C40B51DD5C66A7F320DA /* Preview Assets.xcassets */; };
-		B765C7468702065E9B97FBE3 /* UIState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A68B703537F875B6AB55B62F /* UIState.swift */; };
 		B8A1FA41CB18F78D40019A02 /* Sidebar.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA7CD69E5602F6DA1A2B09A7 /* Sidebar.swift */; };
 		BAF8A03C07890E9F9D6A4AD3 /* Lato-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4ADE7B9AAE1FB90597028C69 /* Lato-Black.ttf */; };
 		C3BF0DB4D747FCDE5CDE05C3 /* Lato-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9B73308BD7D863955E7D7547 /* Lato-Bold.ttf */; };
@@ -95,6 +95,7 @@
 		727881524EBE3AF85305AFDC /* PDFExportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFExportService.swift; sourceTree = "<group>"; };
 		73299758605681F4D1216BFE /* Freewrite.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Freewrite.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		751C0412F2E2CFF1B4568A47 /* ColorStrategy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorStrategy.swift; sourceTree = "<group>"; };
+		7A36983D1491230FB30C541D /* TextConstraintValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextConstraintValidator.swift; sourceTree = "<group>"; };
 		7C5898BAF4655E386AD1580B /* FontControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontControls.swift; sourceTree = "<group>"; };
 		7CE1C429577B25F2C145616E /* Lato-Italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-Italic.ttf"; sourceTree = "<group>"; };
 		7FFBE9A5852FF6885F2AD682 /* FileManagementServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileManagementServiceProtocol.swift; sourceTree = "<group>"; };
@@ -104,7 +105,6 @@
 		9230E1B84F9CB5723D08D396 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		9B73308BD7D863955E7D7547 /* Lato-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-Bold.ttf"; sourceTree = "<group>"; };
 		A5AB9FC47C088B4CFBB06208 /* freewrite.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = freewrite.entitlements; sourceTree = "<group>"; };
-		A68B703537F875B6AB55B62F /* UIState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIState.swift; sourceTree = "<group>"; };
 		AFC435D41326C9A4D20FDD5C /* freewriteTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = freewriteTests.swift; sourceTree = "<group>"; };
 		B941C40B51DD5C66A7F320DA /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		BDF7F78E5A076C9D0F12DAEA /* StateManagers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StateManagers.swift; sourceTree = "<group>"; };
@@ -376,7 +376,6 @@
 		B80373A562A1C1BC40007E48 /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				A68B703537F875B6AB55B62F /* UIState.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -386,6 +385,7 @@
 			children = (
 				36379BE129346215AA2A6091 /* Implementations */,
 				5C37EAD5B07853C231E03DCD /* Protocols */,
+				7A36983D1491230FB30C541D /* TextConstraintValidator.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -647,8 +647,8 @@
 				1C59B187AE4A17750BE3EBD6 /* ServiceRegistry.swift in Sources */,
 				B8A1FA41CB18F78D40019A02 /* Sidebar.swift in Sources */,
 				3A71502540B3B3A51C5A797D /* StateManagers.swift in Sources */,
+				295EEF1E58DFCF4C1595720F /* TextConstraintValidator.swift in Sources */,
 				068B80F3EC89F84CAAB1966D /* TimerServiceProtocol.swift in Sources */,
-				B765C7468702065E9B97FBE3 /* UIState.swift in Sources */,
 				C54DDBBF284C0983EDCEF7AF /* freewriteApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

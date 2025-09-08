@@ -1,5 +1,6 @@
 import SwiftUI
 import AppKit
+import Combine
 
 /// A text editor that enforces freewriting constraints
 struct ConstrainedTextEditor: View {
@@ -8,6 +9,7 @@ struct ConstrainedTextEditor: View {
     
     @State private var lastValidText: String = ""
     @State private var textEditor: NSTextView?
+    @State private var notificationCancellable: AnyCancellable?
     
     var body: some View {
         FreewriteTextEditor(
@@ -18,28 +20,37 @@ struct ConstrainedTextEditor: View {
                 setupConstraints(for: editor)
             }
         )
-        .onReceive(NotificationCenter.default.publisher(for: NSText.didChangeNotification)) { notification in
-            guard let textView = notification.object as? NSTextView,
-                  textView == textEditor else { return }
-            
-            enforceConstraints(in: textView)
+        .onAppear {
+            setupNotificationObserver()
+        }
+        .onDisappear {
+            cleanupNotificationObserver()
         }
     }
     
     // MARK: - Constraint Enforcement
     
     private func setupConstraints(for textView: NSTextView) {
-        // Disable spell checking and grammar checking
-        textView.isContinuousSpellCheckingEnabled = false
-        textView.isGrammarCheckingEnabled = false
-        
-        // Disable smart quotes and other automatic text replacement
-        textView.isAutomaticQuoteSubstitutionEnabled = false
-        textView.isAutomaticDashSubstitutionEnabled = false
-        textView.isAutomaticTextReplacementEnabled = false
-        
-        // Store initial valid text
+        TextConstraintValidator.configureTextViewForFreewriting(textView)
         lastValidText = text
+    }
+    
+    // MARK: - Notification Management
+    
+    private func setupNotificationObserver() {
+        notificationCancellable = NotificationCenter.default
+            .publisher(for: NSText.didChangeNotification)
+            .sink { notification in
+                guard let textView = notification.object as? NSTextView,
+                      textView == textEditor else { return }
+                
+                enforceConstraints(in: textView)
+            }
+    }
+    
+    private func cleanupNotificationObserver() {
+        notificationCancellable?.cancel()
+        notificationCancellable = nil
     }
     
     private func enforceConstraints(in textView: NSTextView) {
@@ -48,29 +59,31 @@ struct ConstrainedTextEditor: View {
         let currentText = textStorage.string
         let currentRange = textView.selectedRange()
         
-        // Check if user is trying to edit previous text
-        if isEditingPreviousContent(current: currentText, previous: lastValidText, cursorPosition: currentRange.location) {
-            // Revert to last valid state
-            textStorage.replaceCharacters(in: NSRange(location: 0, length: textStorage.length), with: lastValidText)
+        let validationResult = TextConstraintValidator.validateTextChange(
+            currentText: currentText,
+            previousText: lastValidText,
+            cursorPosition: currentRange.location
+        )
+        
+        if !validationResult.isValid {
+            guard let correctedText = validationResult.correctedText else { return }
             
-            // Move cursor to end
-            let endPosition = lastValidText.count
-            textView.setSelectedRange(NSRange(location: endPosition, length: 0))
+            // Apply correction
+            textStorage.replaceCharacters(
+                in: NSRange(location: 0, length: textStorage.length),
+                with: correctedText
+            )
             
-            // Provide feedback (subtle shake or beep)
-            provideFeedback()
+            // Update cursor position
+            let cursorPosition = validationResult.cursorPosition ?? correctedText.count
+            textView.setSelectedRange(NSRange(location: cursorPosition, length: 0))
+            
+            // Provide feedback if needed
+            if validationResult.shouldProvideFeedback {
+                TextConstraintValidator.provideFeedback()
+            }
             
             return
-        }
-        
-        // Check if the text still has required prefix
-        if !currentText.hasPrefix(FreewriteConstants.headerString) {
-            let correctedText = FreewriteConstants.headerString + currentText
-            textStorage.replaceCharacters(in: NSRange(location: 0, length: textStorage.length), with: correctedText)
-            
-            // Adjust cursor position
-            let newPosition = currentRange.location + FreewriteConstants.headerString.count
-            textView.setSelectedRange(NSRange(location: newPosition, length: 0))
         }
         
         // Update last valid text if this is a valid forward addition
@@ -80,38 +93,6 @@ struct ConstrainedTextEditor: View {
         }
     }
     
-    private func isEditingPreviousContent(current: String, previous: String, cursorPosition: Int) -> Bool {
-        // If text is shorter, user deleted something
-        if current.count < previous.count {
-            return true
-        }
-        
-        // If cursor is not at the end and text changed, user is editing middle
-        if cursorPosition < previous.count && current != previous {
-            return true
-        }
-        
-        // Check if the existing text was modified (not just appended to)
-        if current.count > previous.count {
-            let commonLength = min(current.count, previous.count)
-            let currentPrefix = String(current.prefix(commonLength))
-            let previousPrefix = String(previous.prefix(commonLength))
-            
-            if currentPrefix != previousPrefix {
-                return true
-            }
-        }
-        
-        return false
-    }
-    
-    private func provideFeedback() {
-        // Subtle system beep
-        NSSound.beep()
-        
-        // Optional: Add a subtle visual indicator
-        // Could flash the border or show a brief message
-    }
 }
 
 // MARK: - NSTextView Wrapper

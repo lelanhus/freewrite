@@ -1,35 +1,28 @@
 import SwiftUI
 
 struct NavigationBar: View {
-    @Binding var fontSize: CGFloat
-    @Binding var selectedFont: String
-    @Binding var hoveredFont: String?
-    @Binding var isHoveringSize: Bool
-    @Binding var isHoveringTimer: Bool
-    @Binding var isHoveringChat: Bool
-    @Binding var isHoveringThemeToggle: Bool
-    @Binding var isHoveringFullscreen: Bool
-    @Binding var isHoveringNewEntry: Bool
-    @Binding var isHoveringClock: Bool
-    @Binding var isHoveringBottomNav: Bool
-    @Binding var showingChatMenu: Bool
-    @Binding var didCopyPrompt: Bool
-    @Binding var showingSidebar: Bool
+    // State Managers (clean parameter passing)
+    @Bindable var typographyState: TypographyStateManager
+    @Bindable var hoverState: HoverStateManager
+    @Bindable var uiState: UIStateManager
+    
+    // Essential bindings that can't be in managers
     @Binding var colorSchemeString: String
-    @Binding var isFullscreen: Bool
     @Binding var text: String
     
+    // Services and computed values
     let timerService: FreewriteTimer
     let colorScheme: ColorScheme
     let canUseChat: Bool
     
+    // Actions
     let onNewEntry: () -> Void
     let onOpenChatGPT: () -> Void
     let onOpenClaude: () -> Void
     let onCopyPrompt: () -> Void
     
     var fontSizeButtonTitle: String {
-        return "\(Int(fontSize))px"
+        return "\(Int(typographyState.fontSize))px"
     }
     
     var timerButtonTitle: String {
@@ -42,11 +35,11 @@ struct NavigationBar: View {
         HStack {
             // Font buttons (left side)
             FontControls(
-                fontSize: $fontSize,
-                selectedFont: $selectedFont,
-                hoveredFont: $hoveredFont,
-                isHoveringSize: $isHoveringSize,
-                isHoveringBottomNav: $isHoveringBottomNav
+                fontSize: $typographyState.fontSize,
+                selectedFont: $typographyState.selectedFont,
+                hoveredFont: $hoverState.hoveredFont,
+                isHoveringSize: $hoverState.isHoveringSize,
+                isHoveringBottomNav: $hoverState.isHoveringBottomNav
             )
             
             Spacer()
@@ -62,10 +55,10 @@ struct NavigationBar: View {
                     }
                 }
                 .buttonStyle(.plain)
-                .foregroundColor(FreewriteColors.timerColor(isRunning: timerService.isRunning, isHovering: isHoveringTimer))
+                .foregroundColor(FreewriteColors.timerColor(isRunning: timerService.isRunning, isHovering: hoverState.isHoveringTimer))
                 .onHover { hovering in
-                    isHoveringTimer = hovering
-                    isHoveringBottomNav = hovering
+                    hoverState.isHoveringTimer = hovering
+                    hoverState.isHoveringBottomNav = hovering
                     if hovering {
                         NSCursor.pointingHand.push()
                     } else {
@@ -75,7 +68,7 @@ struct NavigationBar: View {
                 .onAppear {
                     // Add scroll wheel event monitoring for timer adjustment
                     NSEvent.addLocalMonitorForEvents(matching: .scrollWheel) { event in
-                        if isHoveringTimer {
+                        if hoverState.isHoveringTimer {
                             let scrollBuffer = event.deltaY * 0.25
                             
                             if abs(scrollBuffer) >= 0.1 {
@@ -96,25 +89,25 @@ struct NavigationBar: View {
                 
                 if canUseChat {
                     Button("Chat") {
-                        showingChatMenu = true
-                        didCopyPrompt = false
+                        uiState.showingChatMenu = true
+                        uiState.didCopyPrompt = false
                     }
                     .buttonStyle(.plain)
-                    .navigationButton(isHovering: isHoveringChat)
+                    .navigationButton(isHovering: hoverState.isHoveringChat)
                     .onHover { hovering in
-                        isHoveringChat = hovering
-                        isHoveringBottomNav = hovering
+                        hoverState.isHoveringChat = hovering
+                        hoverState.isHoveringBottomNav = hovering
                         if hovering {
                             NSCursor.pointingHand.push()
                         } else {
                             NSCursor.pop()
                         }
                     }
-                    .popover(isPresented: $showingChatMenu, attachmentAnchor: .point(UnitPoint(x: 0.5, y: 0)), arrowEdge: .top) {
+                    .popover(isPresented: $uiState.showingChatMenu, attachmentAnchor: .point(UnitPoint(x: 0.5, y: 0)), arrowEdge: .top) {
                         ChatMenu(
                             text: text,
-                            didCopyPrompt: $didCopyPrompt,
-                            showingChatMenu: $showingChatMenu,
+                            didCopyPrompt: $uiState.didCopyPrompt,
+                            showingChatMenu: $uiState.showingChatMenu,
                             onOpenChatGPT: onOpenChatGPT,
                             onOpenClaude: onOpenClaude,
                             onCopyPrompt: onCopyPrompt
@@ -128,12 +121,12 @@ struct NavigationBar: View {
                     colorSchemeString = colorScheme == .light ? "dark" : "light"
                 }) {
                     Image(systemName: colorScheme == .light ? "moon.fill" : "sun.max.fill")
-                        .foregroundColor(FreewriteColors.themeToggle.tinted(with: isHoveringThemeToggle ? .white : .clear))
+                        .foregroundColor(FreewriteColors.themeToggle.tinted(with: hoverState.isHoveringThemeToggle ? .white : .clear))
                 }
                 .buttonStyle(.plain)
                 .onHover { hovering in
-                    isHoveringThemeToggle = hovering
-                    isHoveringBottomNav = hovering
+                    hoverState.isHoveringThemeToggle = hovering
+                    hoverState.isHoveringBottomNav = hovering
                     if hovering {
                         NSCursor.pointingHand.push()
                     } else {
@@ -143,16 +136,16 @@ struct NavigationBar: View {
 
                 Text("•").foregroundColor(FreewriteColors.separator)
                 
-                Button(isFullscreen ? "Minimize" : "Fullscreen") {
+                Button(uiState.isFullscreen ? "Minimize" : "Fullscreen") {
                     if let window = NSApplication.shared.windows.first {
                         window.toggleFullScreen(nil)
                     }
                 }
                 .buttonStyle(.plain)
-                .navigationButton(isHovering: isHoveringFullscreen)
+                .navigationButton(isHovering: hoverState.isHoveringFullscreen)
                 .onHover { hovering in
-                    isHoveringFullscreen = hovering
-                    isHoveringBottomNav = hovering
+                    hoverState.isHoveringFullscreen = hovering
+                    hoverState.isHoveringBottomNav = hovering
                     if hovering {
                         NSCursor.pointingHand.push()
                     } else {
@@ -166,10 +159,10 @@ struct NavigationBar: View {
                     onNewEntry()
                 }
                 .buttonStyle(.plain)
-                .navigationButton(isHovering: isHoveringNewEntry)
+                .navigationButton(isHovering: hoverState.isHoveringNewEntry)
                 .onHover { hovering in
-                    isHoveringNewEntry = hovering
-                    isHoveringBottomNav = hovering
+                    hoverState.isHoveringNewEntry = hovering
+                    hoverState.isHoveringBottomNav = hovering
                     if hovering {
                         NSCursor.pointingHand.push()
                     } else {
@@ -181,16 +174,16 @@ struct NavigationBar: View {
                 
                 Button(action: {
                     withAnimation(.easeInOut(duration: 0.2)) {
-                        showingSidebar.toggle()
+                        uiState.showingSidebar.toggle()
                     }
                 }) {
                     Image(systemName: "clock.arrow.circlepath")
-                        .foregroundColor(FreewriteColors.navigationTextColor(isHovering: isHoveringClock))
+                        .foregroundColor(FreewriteColors.navigationTextColor(isHovering: hoverState.isHoveringClock))
                 }
                 .buttonStyle(.plain)
                 .onHover { hovering in
-                    isHoveringClock = hovering
-                    isHoveringBottomNav = hovering
+                    hoverState.isHoveringClock = hovering
+                    hoverState.isHoveringBottomNav = hovering
                     if hovering {
                         NSCursor.pointingHand.push()
                     } else {
@@ -201,13 +194,13 @@ struct NavigationBar: View {
             .padding(8)
             .cornerRadius(6)
             .onHover { hovering in
-                isHoveringBottomNav = hovering
+                hoverState.isHoveringBottomNav = hovering
             }
         }
         .padding()
         .background(FreewriteColors.navigationBackground)
         .onHover { hovering in
-            isHoveringBottomNav = hovering
+            hoverState.isHoveringBottomNav = hovering
         }
     }
 }
