@@ -1,0 +1,96 @@
+name: Freewrite
+options:
+  bundleIdPrefix: io.freewrite
+  deploymentTarget:
+    macOS: "14.0"
+  groupSortPosition: top
+  generateEmptyDirectories: true
+  minimumXcodeGenVersion: 2.38.0
+
+settings:
+  base:
+    SWIFT_VERSION: "6"
+    SWIFT_STRICT_CONCURRENCY: complete
+    ENABLE_STRICT_OBJC_MSGSEND: YES
+    GCC_C_LANGUAGE_STANDARD: c17
+    CLANG_CXX_LANGUAGE_STANDARD: c++20
+    MACOSX_DEPLOYMENT_TARGET: "14.0"
+    TARGETED_DEVICE_FAMILY: "1,2"
+
+packages:
+  swift-testing:
+    url: https://github.com/apple/swift-testing
+    from: 0.7.0
+
+targets:
+  Freewrite:
+    type: application
+    platform: macOS
+    sources:
+      - path: Sources/App
+      - path: Sources/Core
+      - path: Sources/Features
+    resources:
+      - path: Resources
+        includes:
+          - "*.md"
+          - "*.ttf"
+          - "Assets.xcassets"
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: io.freewrite.app
+        INFOPLIST_FILE: Resources/Info.plist
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        DEVELOPMENT_TEAM: $(DEVELOPMENT_TEAM)
+        CODE_SIGN_STYLE: Automatic
+        ENABLE_HARDENED_RUNTIME: YES
+        COMBINE_HIDPI_IMAGES: YES
+
+  FreewriteTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - path: Tests/UnitTests
+      - path: Tests/IntegrationTests
+      - path: Tests/Mocks
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: io.freewrite.tests
+        GENERATE_INFOPLIST_FILE: YES
+    dependencies:
+      - target: Freewrite
+      - package: swift-testing
+
+  FreewriteUITests:
+    type: bundle.ui-testing
+    platform: macOS
+    sources:
+      - path: Tests/UITests
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: io.freewrite.uitests
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_TARGET_NAME: Freewrite
+    dependencies:
+      - target: Freewrite
+
+schemes:
+  Freewrite:
+    build:
+      targets:
+        Freewrite: all
+    run:
+      config: Debug
+      commandLineArguments:
+        "--uitesting": false
+      environmentVariables:
+        SWIFT_DETERMINISTIC_HASHING: "1"
+    test:
+      config: Debug
+      targets:
+        - name: FreewriteTests
+          parallelizable: true
+        - name: FreewriteUITests
+          parallelizable: false
+    archive:
+      config: Release
