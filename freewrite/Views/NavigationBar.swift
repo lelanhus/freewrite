@@ -7,7 +7,6 @@ struct NavigationBar: View {
     @Bindable var uiState: UIStateManager
     
     // Essential bindings that can't be in managers
-    @Binding var colorSchemeString: String
     @Binding var text: String
     
     // Services and computed values
@@ -20,6 +19,7 @@ struct NavigationBar: View {
     let onOpenChatGPT: () -> Void
     let onOpenClaude: () -> Void
     let onCopyPrompt: () -> Void
+    let onColorSchemeToggle: () -> Void
     
     // Event Monitor Management
     @State private var scrollEventMonitor: Any?
@@ -108,7 +108,7 @@ struct NavigationBar: View {
                 }
                 
                 Button(action: {
-                    colorSchemeString = colorScheme == .light ? "dark" : "light"
+                    onColorSchemeToggle()
                 }) {
                     Image(systemName: colorScheme == .light ? "moon.fill" : "sun.max.fill")
                         .foregroundColor(FreewriteColors.themeToggle.tinted(with: hoverState.isHoveringThemeToggle ? .white : .clear))

@@ -19,11 +19,16 @@ struct ContentView: View {
     @State private var timerCancellable: AnyCancellable?
     @State private var fullscreenCancellables = Set<AnyCancellable>()
     
-    @AppStorage("colorScheme") private var colorSchemeString: String = "light"
+    // Color scheme passed from parent to avoid @AppStorage threading issues
+    let colorScheme: ColorScheme
+    let onColorSchemeToggle: () -> Void
     
     // MARK: - Initialization
     
-    init() {
+    init(colorScheme: ColorScheme = .light, onColorSchemeToggle: @escaping () -> Void = {}) {
+        self.colorScheme = colorScheme
+        self.onColorSchemeToggle = onColorSchemeToggle
+        
         // Safe service resolution with proper error handling
         do {
             self.timerService = try DIContainer.shared.resolveSafe(TimerServiceProtocol.self) as! FreewriteTimer
@@ -32,11 +37,6 @@ struct ContentView: View {
         } catch {
             fatalError("Failed to resolve services: \(error). Ensure DIContainer.configure() is called before creating ContentView.")
         }
-    }
-    
-    // Computed properties
-    private var colorScheme: ColorScheme {
-        return colorSchemeString == "dark" ? .dark : .light
     }
     
     
@@ -92,7 +92,6 @@ struct ContentView: View {
                         typographyState: typographyState,
                         hoverState: hoverState,
                         uiState: uiState,
-                        colorSchemeString: $colorSchemeString,
                         text: $text,
                         timerService: timerService,
                         colorScheme: colorScheme,
@@ -104,7 +103,8 @@ struct ContentView: View {
                         },
                         onOpenChatGPT: { openChatGPT() },
                         onOpenClaude: { openClaude() },
-                        onCopyPrompt: { copyPromptToClipboard() }
+                        onCopyPrompt: { copyPromptToClipboard() },
+                        onColorSchemeToggle: onColorSchemeToggle
                     )
                     .opacity(uiState.bottomNavOpacity)
                     .onHover { hovering in

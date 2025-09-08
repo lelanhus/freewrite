@@ -14,7 +14,12 @@ struct FreewriteApp: App {
     var body: some Scene {
         WindowGroup {
             if isConfigured {
-                ContentView()
+                ContentView(
+                    colorScheme: colorSchemeString == "dark" ? .dark : .light,
+                    onColorSchemeToggle: {
+                        colorSchemeString = colorSchemeString == "light" ? "dark" : "light"
+                    }
+                )
                     .toolbar(.hidden, for: .windowToolbar)
                     .preferredColorScheme(colorSchemeString == "dark" ? .dark : .light)
             } else {
