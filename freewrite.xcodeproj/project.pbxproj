@@ -394,7 +394,6 @@
 			isa = PBXGroup;
 			children = (
 				985C4DAD7018B6E9E6962DF6 /* DependencyContainer */,
-				F2F38D3527580C8CCA9BF865 /* Extensions */,
 				678C3C59624F30A5832A2569 /* Macros */,
 				8C751DD1F7FBAE93A02519DD /* Models */,
 				BAD1E0CC5351D847EDC4B017 /* Services */,
@@ -446,13 +445,6 @@
 			children = (
 			);
 			path = Components;
-			sourceTree = "<group>";
-		};
-		F2F38D3527580C8CCA9BF865 /* Extensions */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Extensions;
 			sourceTree = "<group>";
 		};
 		F540022350082734E6251437 /* freewrite */ = {

@@ -32,11 +32,15 @@ final class FileManagementService: FileManagementServiceProtocol {
     nonisolated(unsafe) private var directoryMonitor: DispatchSourceFileSystemObject?
     private let monitorQueue = DispatchQueue(label: "freewrite.directorymonitor", qos: .utility)
     
-    // Cached documents directory for performance
+    // Simple documents directory with basic safety
     private lazy var documentsDirectory: URL = {
-        let directory = fileManager
-            .urls(for: .documentDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent(FileSystemConstants.documentsDirectoryName)
+        let urls = fileManager.urls(for: .documentDirectory, in: .userDomainMask)
+        guard let documentsURL = urls.first else {
+            print("Warning: Cannot access Documents directory")
+            return FileManager.default.temporaryDirectory.appendingPathComponent("Freewrite")
+        }
+        
+        let directory = documentsURL.appendingPathComponent(FileSystemConstants.documentsDirectoryName)
         
         // Create directory if it doesn't exist
         if !fileManager.fileExists(atPath: directory.path) {
