@@ -235,19 +235,45 @@ final class FileManagementService: FileManagementServiceProtocol {
     }
     
     private func processEntryFiles(_ fileURLs: [URL]) async throws -> [WritingEntryDTO] {
-        var entries: [WritingEntryDTO] = []
+        // Use TaskGroup with concurrency limit to prevent resource exhaustion
+        let maxConcurrentOperations = 5 // Reasonable limit for file operations
         
-        for fileURL in fileURLs {
-            do {
-                let entry = try await processEntryFile(fileURL)
-                entries.append(entry)
-            } catch {
-                print("Error processing entry \(fileURL.lastPathComponent): \(error)")
-                // Continue processing other entries
+        return try await withThrowingTaskGroup(of: WritingEntryDTO?.self) { group in
+            var entries: [WritingEntryDTO] = []
+            var currentBatch = 0
+            
+            for fileURL in fileURLs {
+                // Limit concurrent operations to prevent file handle exhaustion
+                if currentBatch >= maxConcurrentOperations {
+                    // Wait for some tasks to complete before adding more
+                    if let entry = try await group.next() {
+                        if let validEntry = entry {
+                            entries.append(validEntry)
+                        }
+                    }
+                    currentBatch -= 1
+                }
+                
+                group.addTask { [fileURL] in
+                    do {
+                        return try await self.processEntryFile(fileURL)
+                    } catch {
+                        print("Error processing entry \(fileURL.lastPathComponent): \(error)")
+                        return nil // Return nil for failed entries, continue processing
+                    }
+                }
+                currentBatch += 1
             }
+            
+            // Collect remaining results
+            for try await entry in group {
+                if let validEntry = entry {
+                    entries.append(validEntry)
+                }
+            }
+            
+            return entries
         }
-        
-        return entries
     }
     
     private func processEntryFile(_ fileURL: URL) async throws -> WritingEntryDTO {
