@@ -28,6 +28,8 @@ struct ContentView: View {
     @State private var entries: [WritingEntryDTO] = []
     @State private var selectedEntryId: UUID? = nil
     @State private var hoveredEntryId: UUID? = nil
+    @State private var isFullscreen = false
+    @State private var isHoveringFullscreen = false
     
     let placeholderOptions = [
         "\n\nBegin writing",
@@ -407,6 +409,25 @@ struct ContentView: View {
 
                             Text("•").foregroundColor(.gray)
                             
+                            Button(isFullscreen ? "Minimize" : "Fullscreen") {
+                                if let window = NSApplication.shared.windows.first {
+                                    window.toggleFullScreen(nil)
+                                }
+                            }
+                            .buttonStyle(.plain)
+                            .foregroundColor(isHoveringFullscreen ? textHoverColor : textColor)
+                            .onHover { hovering in
+                                isHoveringFullscreen = hovering
+                                isHoveringBottomNav = hovering
+                                if hovering {
+                                    NSCursor.pointingHand.push()
+                                } else {
+                                    NSCursor.pop()
+                                }
+                            }
+
+                            Text("•").foregroundColor(.gray)
+                            
                             Button("New Entry") {
                                 Task {
                                     await createNewEntry()
@@ -592,6 +613,12 @@ struct ContentView: View {
                     bottomNavOpacity = 1.0
                 }
             }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSWindow.willEnterFullScreenNotification)) { _ in
+            isFullscreen = true
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSWindow.willExitFullScreenNotification)) { _ in
+            isFullscreen = false
         }
     }
     
