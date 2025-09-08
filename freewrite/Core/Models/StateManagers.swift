@@ -25,6 +25,7 @@ final class UIStateManager {
     // Menu state management to prevent corruption
     private var menuTransitionInProgress = false
     var isFullscreen = false
+    var isDistractionFreeMode = false // Manual distraction-free override
     
     // Callback for hover state coordination
     var notifyHoverStateReset: (() -> Void)?

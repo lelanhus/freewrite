@@ -424,7 +424,13 @@ struct ContentView: View {
         timerCancellable = Timer.publish(every: 1, on: .main, in: .common)
             .autoconnect()
             .sink { _ in
-                // Handle timer updates - make bottom nav disappear when timer is running
+                // Handle timer updates - respect distraction-free mode setting
+                if uiState.isDistractionFreeMode {
+                    // Distraction-free mode is manually controlled, don't change opacity
+                    return
+                }
+                
+                // Auto-hide nav when timer running (unless user is hovering or in distraction-free mode)
                 if timerService.isRunning && !hoverState.isHoveringBottomNav {
                     withAnimation(.easeIn(duration: 1.0)) {
                         uiState.bottomNavOpacity = 0.0
@@ -480,7 +486,12 @@ struct ContentView: View {
         
         // Essential flow shortcuts
         keyboardManager.onNewSession = {
-            Task { await createNewEntry() }
+            Task { 
+                await createNewEntry()
+                // Reset timer for new session
+                timerService.reset()
+                timerService.start()
+            }
             disclosureManager.registerShortcutUsed("⌘N")
         }
         
@@ -494,9 +505,12 @@ struct ContentView: View {
         }
         
         keyboardManager.onToggleDistractionFree = {
-            // Toggle all UI elements for pure writing focus
+            // Toggle distraction-free mode state
+            uiState.isDistractionFreeMode.toggle()
+            
+            // Apply the visual changes
             withAnimation(.easeInOut(duration: 0.3)) {
-                uiState.bottomNavOpacity = uiState.bottomNavOpacity > 0 ? 0.0 : 1.0
+                uiState.bottomNavOpacity = uiState.isDistractionFreeMode ? 0.0 : 1.0
             }
             disclosureManager.registerShortcutUsed("⌘D")
         }
