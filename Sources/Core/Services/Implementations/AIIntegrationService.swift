@@ -2,6 +2,7 @@ import Foundation
 import AppKit
 
 /// AI integration service implementation
+@MainActor
 final class AIIntegrationService: AIIntegrationServiceProtocol {
     
     func canShareViaURL(_ content: String) -> Bool {

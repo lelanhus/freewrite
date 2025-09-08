@@ -23,10 +23,22 @@ final class DIContainer: Sendable {
     /// Resolves a service instance
     /// - Parameter type: The service type to resolve
     /// - Returns: Service instance
-    /// - Throws: Fatal error if service is not registered
+    /// - Throws: Fatal error if service is not registered (legacy - being phased out)
     func resolve<T>(_ type: T.Type) -> T {
         guard let service = services.resolve(type) else {
+            // TODO: Replace all call sites with resolveSafe and remove this method
             fatalError("Service \(type) not registered. Make sure DIContainer.configure() is called.")
+        }
+        return service
+    }
+    
+    /// Safe resolve method that throws instead of crashing
+    /// - Parameter type: The service type to resolve
+    /// - Returns: Service instance
+    /// - Throws: FreewriteError.invalidConfiguration if service not registered
+    func resolveSafe<T>(_ type: T.Type) throws -> T {
+        guard let service = services.resolve(type) else {
+            throw FreewriteError.invalidConfiguration
         }
         return service
     }
@@ -154,6 +166,7 @@ final class MockExportService: @unchecked Sendable, ExportServiceProtocol {
     func suggestedFilename(for entryId: UUID, format: ExportFormat) async throws -> String { fatalError("Mock not implemented") }
 }
 
+@MainActor
 final class MockAIIntegrationService: @unchecked Sendable, AIIntegrationServiceProtocol {
     func canShareViaURL(_ content: String) -> Bool { fatalError("Mock not implemented") }
     func generateChatGPTURL(content: String, prompt: String?) throws -> URL { fatalError("Mock not implemented") }

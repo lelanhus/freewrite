@@ -1,6 +1,7 @@
 import Foundation
 
 /// Service responsible for AI integration (ChatGPT, Claude)
+@MainActor
 protocol AIIntegrationServiceProtocol: Sendable {
     /// Validates if text content can be shared via URL
     /// - Parameter content: The text content to validate
