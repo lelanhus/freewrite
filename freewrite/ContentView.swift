@@ -206,10 +206,17 @@ struct ContentView: View {
             uiState.placeholderText = PlaceholderConstants.random()
             setupTimerSubscription()
             setupFullscreenSubscriptions()
+            
+            // Setup hover state coordination to prevent pollution
+            uiState.notifyHoverStateReset = { [weak hoverState] in
+                hoverState?.resetAllHover()
+            }
         }
         .onDisappear {
             cleanupTimerSubscription()
             cleanupFullscreenSubscriptions()
+            // Reset hover states on view disappear to prevent pollution
+            hoverState.resetAllHover()
         }
     }
     
@@ -340,6 +347,9 @@ struct ContentView: View {
     }
     
     private func loadEntry(_ entry: WritingEntryDTO) async {
+        // Reset hover states when switching entries to prevent pollution
+        hoverState.resetAllHover()
+        
         do {
             selectedEntryId = entry.id
             let content = try await fileService.loadEntry(entry.id)

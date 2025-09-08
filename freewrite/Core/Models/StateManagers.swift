@@ -10,11 +10,21 @@ final class UIStateManager {
     var fontSize: CGFloat = 18
     var bottomNavOpacity: Double = 1.0
     var placeholderText: String = ""
-    var showingSidebar = false
+    var showingSidebar = false {
+        didSet {
+            if showingSidebar != oldValue {
+                // Reset hover states when sidebar toggles to prevent pollution
+                notifyHoverStateReset?()
+            }
+        }
+    }
     var viewHeight: CGFloat = 0
     var showingChatMenu = false
     var didCopyPrompt: Bool = false
     var isFullscreen = false
+    
+    // Callback for hover state coordination
+    var notifyHoverStateReset: (() -> Void)?
     
     private var colorSchemeString: String = "light"
     
