@@ -5,6 +5,13 @@ import Foundation
 final class FileManagementService: FileManagementServiceProtocol {
     private let fileManager = FileManager.default
     
+    // Background queue for heavy file operations to prevent UI blocking
+    private let fileOperationQueue = DispatchQueue(
+        label: "freewrite.fileoperations", 
+        qos: .userInitiated,
+        attributes: .concurrent
+    )
+    
     // Entry caching for performance
     private var entryCache: [UUID: WritingEntryDTO] = [:]
     private var entryCacheTimestamp: Date?
@@ -93,12 +100,17 @@ final class FileManagementService: FileManagementServiceProtocol {
         
         let fileURL = documentsDirectory.appendingPathComponent(entry.filename)
         
-        do {
-            let content = try String(contentsOf: fileURL, encoding: .utf8)
-            print("Loaded entry: \(entry.filename)")
-            return content
-        } catch {
-            throw FreewriteError.fileOperationFailed("Failed to load entry: \(error)")
+        // Move file reading to background queue to prevent UI blocking
+        return try await withCheckedThrowingContinuation { continuation in
+            fileOperationQueue.async {
+                do {
+                    let content = try String(contentsOf: fileURL, encoding: .utf8)
+                    print("Loaded entry: \(entry.filename)")
+                    continuation.resume(returning: content)
+                } catch {
+                    continuation.resume(throwing: FreewriteError.fileOperationFailed("Failed to load entry: \(error)"))
+                }
+            }
         }
     }
     
@@ -122,26 +134,35 @@ final class FileManagementService: FileManagementServiceProtocol {
             activeSaveOperations.remove(entryId)
         }
         
-        do {
-            // Atomic file write and cache update
-            try content.write(to: fileURL, atomically: true, encoding: .utf8)
-            
-            // Update cache with modified entry data (must be after successful write)
-            let updatedEntry = WritingEntryDTO(
-                id: entry.id,
-                filename: entry.filename,
-                displayDate: entry.displayDate,
-                previewText: extractPreviewText(from: content),
-                wordCount: calculateWordCount(content),
-                isWelcomeEntry: entry.isWelcomeEntry,
-                createdAt: entry.createdAt,
-                modifiedAt: Date()
-            )
-            updateCacheEntry(updatedEntry)
-            
-            print("Saved entry: \(entry.filename)")
-        } catch {
-            throw FreewriteError.fileOperationFailed("Failed to save entry: \(error)")
+        // Move file writing to background queue to prevent UI blocking
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            fileOperationQueue.async {
+                do {
+                    // Atomic file write on background queue
+                    try content.write(to: fileURL, atomically: true, encoding: .utf8)
+                    
+                    // Switch back to main actor for cache update
+                    Task { @MainActor in
+                        // Update cache with modified entry data (must be after successful write)
+                        let updatedEntry = WritingEntryDTO(
+                            id: entry.id,
+                            filename: entry.filename,
+                            displayDate: entry.displayDate,
+                            previewText: self.extractPreviewText(from: content),
+                            wordCount: self.calculateWordCount(content),
+                            isWelcomeEntry: entry.isWelcomeEntry,
+                            createdAt: entry.createdAt,
+                            modifiedAt: Date()
+                        )
+                        self.updateCacheEntry(updatedEntry)
+                        
+                        print("Saved entry: \(entry.filename)")
+                        continuation.resume()
+                    }
+                } catch {
+                    continuation.resume(throwing: FreewriteError.fileOperationFailed("Failed to save entry: \(error)"))
+                }
+            }
         }
     }
     
@@ -176,20 +197,41 @@ final class FileManagementService: FileManagementServiceProtocol {
     }
     
     private func loadAllEntriesFromDisk() async throws -> [WritingEntryDTO] {
-        do {
-            let fileURLs = try fileManager.contentsOfDirectory(
-                at: documentsDirectory,
-                includingPropertiesForKeys: nil
-            )
-            
-            let mdFiles = fileURLs.filter { $0.pathExtension == FileSystemConstants.fileExtension }
-            print("Found \(mdFiles.count) entries")
-            
-            let entries = try await processEntryFiles(mdFiles)
-            return entries.sorted { $0.createdAt > $1.createdAt }
-            
-        } catch {
-            throw FreewriteError.fileOperationFailed("Failed to load entries: \(error)")
+        // Move heavy directory scanning to background queue to prevent UI blocking
+        let directoryURL = documentsDirectory // Capture MainActor property
+        
+        return try await withCheckedThrowingContinuation { continuation in
+            fileOperationQueue.async { [weak self] in
+                guard let self = self else {
+                    continuation.resume(throwing: FreewriteError.invalidConfiguration)
+                    return
+                }
+                
+                do {
+                    // Use separate FileManager instance for background operations
+                    let backgroundFileManager = FileManager()
+                    let fileURLs = try backgroundFileManager.contentsOfDirectory(
+                        at: directoryURL,
+                        includingPropertiesForKeys: nil
+                    )
+                    
+                    let mdFiles = fileURLs.filter { $0.pathExtension == FileSystemConstants.fileExtension }
+                    print("Found \(mdFiles.count) entries")
+                    
+                    // Process files on background queue
+                    Task {
+                        do {
+                            let entries = try await self.processEntryFiles(mdFiles)
+                            let sortedEntries = entries.sorted { $0.createdAt > $1.createdAt }
+                            continuation.resume(returning: sortedEntries)
+                        } catch {
+                            continuation.resume(throwing: error)
+                        }
+                    }
+                } catch {
+                    continuation.resume(throwing: FreewriteError.fileOperationFailed("Failed to load entries: \(error)"))
+                }
+            }
         }
     }
     
