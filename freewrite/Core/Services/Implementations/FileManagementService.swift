@@ -28,38 +28,8 @@ final class FileManagementService: FileManagementServiceProtocol {
     // File operation coordination to prevent corruption
     private var activeSaveOperations: Set<UUID> = []
     
-    // Directory monitoring for intelligent cache invalidation (nonisolated for deinit access)
-    nonisolated(unsafe) private var directoryMonitor: DispatchSourceFileSystemObject?
-    private let monitorQueue = DispatchQueue(label: "freewrite.directorymonitor", qos: .utility)
-    
-    // Simple documents directory with basic safety
-    private lazy var documentsDirectory: URL = {
-        let urls = fileManager.urls(for: .documentDirectory, in: .userDomainMask)
-        guard let documentsURL = urls.first else {
-            print("Warning: Cannot access Documents directory")
-            return FileManager.default.temporaryDirectory.appendingPathComponent("Freewrite")
-        }
-        
-        let directory = documentsURL.appendingPathComponent(FileSystemConstants.documentsDirectoryName)
-        
-        // Create directory if it doesn't exist
-        if !fileManager.fileExists(atPath: directory.path) {
-            do {
-                try fileManager.createDirectory(
-                    at: directory,
-                    withIntermediateDirectories: true
-                )
-                print("Created Freewrite directory at: \(directory.path)")
-            } catch {
-                print("Error creating directory: \(error)")
-            }
-        }
-        
-        // Setup directory monitoring after directory is created
-        setupDirectoryMonitoring()
-        
-        return directory
-    }()
+    // Simple documents directory - no lazy property to avoid crashes
+    private var documentsDirectoryCache: URL?
     
     func createNewEntry() async throws -> WritingEntryDTO {
         let id = UUID()
@@ -84,7 +54,7 @@ final class FileManagementService: FileManagementServiceProtocol {
         )
         
         // Atomic file creation with rollback capability
-        let fileURL = documentsDirectory.appendingPathComponent(filename)
+        let fileURL = getDocumentsDirectory().appendingPathComponent(filename)
         let initialContent = FreewriteConstants.headerString
         
         // Check if file already exists to prevent overwriting
@@ -123,7 +93,7 @@ final class FileManagementService: FileManagementServiceProtocol {
             throw FreewriteError.entryNotFound
         }
         
-        let fileURL = documentsDirectory.appendingPathComponent(entry.filename)
+        let fileURL = getDocumentsDirectory().appendingPathComponent(entry.filename)
         
         // Move file reading to background queue to prevent UI blocking
         let content = try await withCheckedThrowingContinuation { continuation in
@@ -153,7 +123,7 @@ final class FileManagementService: FileManagementServiceProtocol {
             throw FreewriteError.entryNotFound
         }
         
-        let fileURL = documentsDirectory.appendingPathComponent(entry.filename)
+        let fileURL = getDocumentsDirectory().appendingPathComponent(entry.filename)
         
         // Mark save operation as active to prevent concurrent writes
         activeSaveOperations.insert(entryId)
@@ -203,7 +173,7 @@ final class FileManagementService: FileManagementServiceProtocol {
             throw FreewriteError.entryNotFound
         }
         
-        let fileURL = documentsDirectory.appendingPathComponent(entry.filename)
+        let fileURL = getDocumentsDirectory().appendingPathComponent(entry.filename)
         
         do {
             try fileManager.removeItem(at: fileURL)
@@ -230,7 +200,7 @@ final class FileManagementService: FileManagementServiceProtocol {
     
     private func loadAllEntriesFromDisk() async throws -> [WritingEntryDTO] {
         // Move heavy directory scanning to background queue to prevent UI blocking
-        let directoryURL = documentsDirectory // Capture MainActor property
+        let directoryURL = getDocumentsDirectory() // Simple method call
         
         return try await withCheckedThrowingContinuation { continuation in
             fileOperationQueue.async { [weak self] in
@@ -279,7 +249,22 @@ final class FileManagementService: FileManagementServiceProtocol {
     }
     
     func getDocumentsDirectory() -> URL {
-        return documentsDirectory
+        if let cached = documentsDirectoryCache {
+            return cached
+        }
+        
+        // Simple, crash-safe directory resolution
+        let urls = fileManager.urls(for: .documentDirectory, in: .userDomainMask)
+        let documentsURL = urls.first ?? FileManager.default.temporaryDirectory
+        let directory = documentsURL.appendingPathComponent("Freewrite")
+        
+        // Create directory if needed
+        if !fileManager.fileExists(atPath: directory.path) {
+            try? fileManager.createDirectory(at: directory, withIntermediateDirectories: true)
+        }
+        
+        documentsDirectoryCache = directory
+        return directory
     }
     
     func entryExists(_ entryId: UUID) async -> Bool {
@@ -515,96 +500,5 @@ final class FileManagementService: FileManagementServiceProtocol {
             print("Warning: Could not get modification date for \(fileURL.lastPathComponent): \(error)")
             return nil
         }
-    }
-    
-    // MARK: - Directory Monitoring (Intelligent Cache Invalidation)
-    
-    private func setupDirectoryMonitoring() {
-        let directoryPath = documentsDirectory.path
-        let descriptor = open(directoryPath, O_EVTONLY)
-        
-        guard descriptor >= 0 else {
-            print("Warning: Could not open directory for monitoring: \(directoryPath)")
-            return
-        }
-        
-        // Setup file system event monitoring for intelligent cache invalidation
-        directoryMonitor = DispatchSource.makeFileSystemObjectSource(
-            fileDescriptor: descriptor,
-            eventMask: [.write, .rename, .delete],
-            queue: monitorQueue
-        )
-        
-        directoryMonitor?.setEventHandler { [weak self] in
-            // Directory changed - perform intelligent cache invalidation
-            Task { @MainActor in
-                await self?.handleDirectoryChange()
-            }
-        }
-        
-        directoryMonitor?.setCancelHandler {
-            close(descriptor)
-        }
-        
-        directoryMonitor?.resume()
-        hasActiveMonitoring = true
-        print("Directory monitoring enabled for: \(directoryPath)")
-    }
-    
-    nonisolated private func cleanupDirectoryMonitoring() {
-        directoryMonitor?.cancel()
-        directoryMonitor = nil
-        // Note: hasActiveMonitoring cannot be set from nonisolated context
-        // This is acceptable since cleanup typically happens during deinit
-    }
-    
-    // MARK: - Enhanced Directory Change Handling
-    
-    private func handleDirectoryChange() async {
-        print("Directory change detected - performing intelligent cache invalidation")
-        
-        // Get current directory state for comparison
-        do {
-            let currentFiles = try FileManager().contentsOfDirectory(
-                at: documentsDirectory,
-                includingPropertiesForKeys: [.contentModificationDateKey]
-            ).filter { $0.pathExtension == FileSystemConstants.fileExtension }
-            
-            // Check for file modifications and invalidate specific content cache entries
-            await invalidateModifiedFileContent(currentFiles)
-            
-            // Always invalidate entry cache for directory structure changes
-            invalidateCache()
-            
-        } catch {
-            print("Warning: Could not check directory changes: \(error)")
-            // Fall back to full cache invalidation
-            invalidateCache()
-        }
-    }
-    
-    private func invalidateModifiedFileContent(_ currentFiles: [URL]) async {
-        for fileURL in currentFiles {
-            let filename = fileURL.lastPathComponent
-            
-            // Extract UUID from filename to check content cache
-            guard let uuidMatch = filename.range(of: "\\[(.*?)\\]", options: .regularExpression),
-                  let uuid = UUID(uuidString: String(filename[uuidMatch].dropFirst().dropLast())) else {
-                continue
-            }
-            
-            // Check if file was modified externally by comparing modification dates
-            if let fileModDate = getFileModificationDate(for: fileURL),
-               let cachedTimestamp = contentCacheTimestamp[uuid],
-               fileModDate > cachedTimestamp {
-                // File was modified externally - invalidate its content cache
-                removeContentCache(uuid)
-                print("Invalidated content cache for externally modified file: \(filename)")
-            }
-        }
-    }
-    
-    deinit {
-        cleanupDirectoryMonitoring()
     }
 }
