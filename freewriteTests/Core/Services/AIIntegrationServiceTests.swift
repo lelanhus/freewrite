@@ -1,8 +1,10 @@
 import Testing
 import Foundation
+import AppKit
 @testable import Freewrite
 
 /// Comprehensive tests for AIIntegrationService
+@MainActor
 struct AIIntegrationServiceTests {
     
     // MARK: - Setup
@@ -28,6 +30,7 @@ struct AIIntegrationServiceTests {
     }
     
     @Test("Claude URL generation with default prompt")
+    @MainActor  
     func testClaudeURLGeneration() async throws {
         let service = createService()
         
