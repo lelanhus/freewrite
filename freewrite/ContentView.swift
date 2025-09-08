@@ -382,5 +382,15 @@ struct ContentView: View {
 
 
 #Preview {
-    ContentView()
+    // Safe preview configuration with proper lifecycle management
+    ContentView(
+        colorScheme: .light,
+        onColorSchemeToggle: {
+            print("Preview: Color scheme toggle - no-op in preview environment")
+        }
+    )
+    .onAppear {
+        // Ensure DI container is configured for previews
+        DIContainer.shared.configure()
+    }
 }
