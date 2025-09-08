@@ -2,6 +2,7 @@ import Foundation
 import AppKit
 
 /// AI integration service implementation
+@MainActor
 final class AIIntegrationService: AIIntegrationServiceProtocol {
     
     func canShareViaURL(_ content: String) -> Bool {
@@ -65,16 +66,39 @@ final class AIIntegrationService: AIIntegrationServiceProtocol {
     func copyPromptToClipboard(content: String, prompt: String? = nil) {
         let fullText = createPromptForClipboard(content: content, prompt: prompt)
         
+        // Validate clipboard content size to prevent system issues
+        if fullText.count > 10_000_000 { // 10MB limit for clipboard safety
+            print("ERROR: Content too large for clipboard (\(fullText.count) characters)")
+            return
+        }
+        
+        // Safe clipboard operations with error handling
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()
-        pasteboard.setString(fullText, forType: .string)
         
-        print("Prompt copied to clipboard (\(fullText.count) characters)")
+        let success = pasteboard.setString(fullText, forType: .string)
+        if success {
+            print("Successfully copied prompt to clipboard (\(fullText.count) characters)")
+        } else {
+            print("ERROR: Failed to copy prompt to clipboard")
+            // Note: Errors are now handled at the ContentView level with proper user presentation
+        }
     }
     
     func openURL(_ url: URL) {
-        NSWorkspace.shared.open(url)
-        print("Opened URL: \(url.absoluteString)")
+        // Validate URL before attempting to open to prevent crashes
+        guard url.absoluteString.hasPrefix("http://") || url.absoluteString.hasPrefix("https://") else {
+            print("ERROR: Invalid URL scheme for: \(url.absoluteString)")
+            return
+        }
+        
+        // Safe URL opening with error handling
+        let success = NSWorkspace.shared.open(url)
+        if success {
+            print("Successfully opened URL: \(url.absoluteString)")
+        } else {
+            print("ERROR: Failed to open URL: \(url.absoluteString)")
+        }
     }
     
     func openChatGPT(with content: String) async throws {

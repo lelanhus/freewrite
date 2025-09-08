@@ -8,7 +8,8 @@ final class FreewriteTimer: TimerServiceProtocol {
     private(set) var isRunning: Bool = false
     private(set) var isFinished: Bool = false
     
-    private var timer: Timer?
+    // Use more efficient timer implementation to reduce system resource contention
+    private var timerSource: DispatchSourceTimer?
     private let timerQueue = DispatchQueue(label: "freewrite.timer", qos: .userInteractive)
     
     init() {}
@@ -96,16 +97,23 @@ final class FreewriteTimer: TimerServiceProtocol {
     private func startSystemTimer() {
         stopSystemTimer() // Ensure no duplicate timers
         
-        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
+        // Use DispatchSourceTimer for more efficient, lower-contention timing
+        timerSource = DispatchSource.makeTimerSource(flags: [], queue: timerQueue)
+        
+        timerSource?.schedule(deadline: .now() + 1.0, repeating: 1.0, leeway: .milliseconds(50))
+        
+        timerSource?.setEventHandler { [weak self] in
             Task { @MainActor in
                 self?.timerTick()
             }
         }
+        
+        timerSource?.resume()
     }
     
     private func stopSystemTimer() {
-        timer?.invalidate()
-        timer = nil
+        timerSource?.cancel()
+        timerSource = nil
     }
     
     private func timerTick() {

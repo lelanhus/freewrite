@@ -1,5 +1,6 @@
 import SwiftUI
 import AppKit
+import Combine
 
 /// A text editor that enforces freewriting constraints
 struct ConstrainedTextEditor: View {
@@ -8,6 +9,7 @@ struct ConstrainedTextEditor: View {
     
     @State private var lastValidText: String = ""
     @State private var textEditor: NSTextView?
+    @State private var notificationCancellable: AnyCancellable?
     
     var body: some View {
         FreewriteTextEditor(
@@ -18,28 +20,37 @@ struct ConstrainedTextEditor: View {
                 setupConstraints(for: editor)
             }
         )
-        .onReceive(NotificationCenter.default.publisher(for: NSText.didChangeNotification)) { notification in
-            guard let textView = notification.object as? NSTextView,
-                  textView == textEditor else { return }
-            
-            enforceConstraints(in: textView)
+        .onAppear {
+            setupNotificationObserver()
+        }
+        .onDisappear {
+            cleanupNotificationObserver()
         }
     }
     
     // MARK: - Constraint Enforcement
     
     private func setupConstraints(for textView: NSTextView) {
-        // Disable spell checking and grammar checking
-        textView.isContinuousSpellCheckingEnabled = false
-        textView.isGrammarCheckingEnabled = false
-        
-        // Disable smart quotes and other automatic text replacement
-        textView.isAutomaticQuoteSubstitutionEnabled = false
-        textView.isAutomaticDashSubstitutionEnabled = false
-        textView.isAutomaticTextReplacementEnabled = false
-        
-        // Store initial valid text
+        TextConstraintValidator.configureTextViewForFreewriting(textView)
         lastValidText = text
+    }
+    
+    // MARK: - Notification Management
+    
+    private func setupNotificationObserver() {
+        notificationCancellable = NotificationCenter.default
+            .publisher(for: NSText.didChangeNotification)
+            .sink { notification in
+                guard let textView = notification.object as? NSTextView,
+                      textView == textEditor else { return }
+                
+                enforceConstraints(in: textView)
+            }
+    }
+    
+    private func cleanupNotificationObserver() {
+        notificationCancellable?.cancel()
+        notificationCancellable = nil
     }
     
     private func enforceConstraints(in textView: NSTextView) {
@@ -48,29 +59,31 @@ struct ConstrainedTextEditor: View {
         let currentText = textStorage.string
         let currentRange = textView.selectedRange()
         
-        // Check if user is trying to edit previous text
-        if isEditingPreviousContent(current: currentText, previous: lastValidText, cursorPosition: currentRange.location) {
-            // Revert to last valid state
-            textStorage.replaceCharacters(in: NSRange(location: 0, length: textStorage.length), with: lastValidText)
+        let validationResult = TextConstraintValidator.validateTextChange(
+            currentText: currentText,
+            previousText: lastValidText,
+            cursorPosition: currentRange.location
+        )
+        
+        if !validationResult.isValid {
+            guard let correctedText = validationResult.correctedText else { return }
             
-            // Move cursor to end
-            let endPosition = lastValidText.count
-            textView.setSelectedRange(NSRange(location: endPosition, length: 0))
+            // Apply correction
+            textStorage.replaceCharacters(
+                in: NSRange(location: 0, length: textStorage.length),
+                with: correctedText
+            )
             
-            // Provide feedback (subtle shake or beep)
-            provideFeedback()
+            // Update cursor position
+            let cursorPosition = validationResult.cursorPosition ?? correctedText.count
+            textView.setSelectedRange(NSRange(location: cursorPosition, length: 0))
+            
+            // Provide feedback if needed
+            if validationResult.shouldProvideFeedback {
+                TextConstraintValidator.provideFeedback()
+            }
             
             return
-        }
-        
-        // Check if the text still has required prefix
-        if !currentText.hasPrefix(FreewriteConstants.headerString) {
-            let correctedText = FreewriteConstants.headerString + currentText
-            textStorage.replaceCharacters(in: NSRange(location: 0, length: textStorage.length), with: correctedText)
-            
-            // Adjust cursor position
-            let newPosition = currentRange.location + FreewriteConstants.headerString.count
-            textView.setSelectedRange(NSRange(location: newPosition, length: 0))
         }
         
         // Update last valid text if this is a valid forward addition
@@ -80,38 +93,6 @@ struct ConstrainedTextEditor: View {
         }
     }
     
-    private func isEditingPreviousContent(current: String, previous: String, cursorPosition: Int) -> Bool {
-        // If text is shorter, user deleted something
-        if current.count < previous.count {
-            return true
-        }
-        
-        // If cursor is not at the end and text changed, user is editing middle
-        if cursorPosition < previous.count && current != previous {
-            return true
-        }
-        
-        // Check if the existing text was modified (not just appended to)
-        if current.count > previous.count {
-            let commonLength = min(current.count, previous.count)
-            let currentPrefix = String(current.prefix(commonLength))
-            let previousPrefix = String(previous.prefix(commonLength))
-            
-            if currentPrefix != previousPrefix {
-                return true
-            }
-        }
-        
-        return false
-    }
-    
-    private func provideFeedback() {
-        // Subtle system beep
-        NSSound.beep()
-        
-        // Optional: Add a subtle visual indicator
-        // Could flash the border or show a brief message
-    }
 }
 
 // MARK: - NSTextView Wrapper
@@ -162,18 +143,38 @@ struct FreewriteTextEditor: NSViewRepresentable {
         
         // Only update if text is different to avoid cursor jumping
         if textView.string != text {
-            let currentSelection = textView.selectedRange()
             textView.string = text
             
-            // Restore selection if valid
-            let newLength = text.count
-            if currentSelection.location <= newLength {
-                textView.setSelectedRange(NSRange(
-                    location: min(currentSelection.location, newLength),
-                    length: 0
-                ))
-            }
+            // Consistent selection restoration - always place cursor at end for freewriting
+            let targetLocation = text.count // Always place cursor at end for forward-only writing
+            
+            textView.setSelectedRange(NSRange(location: targetLocation, length: 0))
+            
+            // Ensure cursor is visible after text update
+            textView.scrollRangeToVisible(NSRange(location: targetLocation, length: 0))
         }
+    }
+    
+    func dismantleNSView(_ scrollView: NSScrollView, context: Context) {
+        // Proper cleanup of AppKit resources to prevent memory leaks
+        guard let textView = scrollView.documentView as? NSTextView else { return }
+        
+        // Clear delegates and references that could cause retention cycles
+        textView.delegate = nil
+        
+        // Clear text storage and layout manager references
+        if let layoutManager = textView.textContainer?.layoutManager,
+           let _ = textView.textContainer {
+            layoutManager.removeTextContainer(at: 0) // Remove by index
+        }
+        
+        // Clear the text content to release any retained strings
+        textView.string = ""
+        
+        // Remove from scroll view
+        scrollView.documentView = nil
+        
+        print("Cleaned up NSTextView resources")
     }
 }
 
@@ -187,15 +188,17 @@ extension NSTextView {
             return
         }
         
-        // Block arrow keys when they would move cursor backwards for editing
+        // Consistent selection handling - maintain cursor at end for freewriting
         if event.keyCode == 123 || event.keyCode == 124 { // Left or Right arrows
             let currentSelection = selectedRange()
-            if event.keyCode == 123 && currentSelection.location > 0 { // Left arrow
-                // Only allow if at the very end of text
-                if currentSelection.location < string.count {
-                    NSSound.beep()
-                    return
-                }
+            
+            // Always enforce cursor at end for consistent freewriting behavior
+            if currentSelection.location < string.count {
+                NSSound.beep()
+                // Force cursor back to end
+                setSelectedRange(NSRange(location: string.count, length: 0))
+                scrollRangeToVisible(NSRange(location: string.count, length: 0))
+                return
             }
         }
         
@@ -220,12 +223,20 @@ extension NSTextView {
     }
     
     private func handlePaste(_ event: NSEvent) {
-        // Allow paste only at the end of text
+        // Consistent paste behavior - always paste at end of text
         let currentSelection = selectedRange()
         if currentSelection.location == string.count {
             super.keyDown(with: event)
+            // Ensure cursor stays at end after paste
+            DispatchQueue.main.async {
+                self.setSelectedRange(NSRange(location: self.string.count, length: 0))
+                self.scrollRangeToVisible(NSRange(location: self.string.count, length: 0))
+            }
         } else {
             NSSound.beep()
+            // Force cursor to end for consistent state
+            setSelectedRange(NSRange(location: string.count, length: 0))
+            scrollRangeToVisible(NSRange(location: string.count, length: 0))
         }
     }
 }

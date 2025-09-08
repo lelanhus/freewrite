@@ -11,6 +11,8 @@ enum FreewriteConstants {
     // Text Editor
     static let maxTextWidth: CGFloat = 650
     static let minimumTextLength: Int = 350
+    static let maximumTextLength: Int = 500_000 // 500k characters - reasonable limit for performance
+    static let warningTextLength: Int = 100_000 // 100k characters - warn user about performance
     static let headerString: String = "\n\n"
     
     // UI Layout
