@@ -273,7 +273,8 @@ struct ContentView: View {
     // MARK: - Entry Management
     
     private func setupInitialState() async {
-        await loadInitialEntry()
+        // Start fresh - no need to load previous session for freewriting
+        await createNewEntry()
     }
     
     private func saveCurrentText() async {
@@ -310,41 +311,6 @@ struct ContentView: View {
         }
     }
     
-    private func loadInitialEntry() async {
-        // Show progress for initial loading which can take time
-        progressState.startLoading("Loading your writing entries...")
-        
-        do {
-            // Update progress during loading
-            progressState.updateProgress(0.3, message: "Scanning entry files...")
-            entries = try await fileService.loadAllEntries()
-            
-            progressState.updateProgress(0.7, message: "Loading most recent entry...")
-            
-            if let mostRecent = entries.first {
-                selectedEntryId = mostRecent.id
-                let content = try await fileService.loadEntry(mostRecent.id)
-                text = content
-                progressState.updateProgress(1.0, message: "Ready to write!")
-            } else {
-                // No entries exist, create first entry
-                progressState.updateProgress(0.9, message: "Creating your first entry...")
-                await createNewEntry()
-            }
-            
-            // Small delay to show completion, then hide
-            try? await Task.sleep(nanoseconds: 300_000_000) // 0.3 seconds
-            progressState.finishLoading()
-            
-        } catch {
-            progressState.finishLoading()
-            // Report initial loading failures with recovery option
-            errorManager.reportError(UserError.entryLoadingFailed(
-                error,
-                createNew: { Task { await self.createNewEntry() } }
-            ))
-        }
-    }
     
     private func loadEntry(_ entry: WritingEntryDTO) async {
         // Reset hover states when switching entries to prevent pollution
