@@ -222,26 +222,36 @@ final class FileManagementService: FileManagementServiceProtocol {
     
     private func refreshEntryCache() async throws {
         let entries = try await loadAllEntriesFromDisk()
-        entryCache.removeAll()
         
+        // Atomic cache replacement - build new cache state first, then replace atomically
+        var newCache: [UUID: WritingEntryDTO] = [:]
         for entry in entries {
-            entryCache[entry.id] = entry
+            newCache[entry.id] = entry
         }
         
+        // Atomic replacement to prevent partial state corruption
+        entryCache = newCache
         entryCacheTimestamp = Date()
     }
     
     private func invalidateCache() {
-        entryCache.removeAll()
+        // Atomic invalidation - timestamp and entries must be consistent
         entryCacheTimestamp = nil
+        entryCache.removeAll()
     }
     
     private func updateCacheEntry(_ entry: WritingEntryDTO) {
-        entryCache[entry.id] = entry
+        // Only update if cache is valid, otherwise ignore to maintain consistency
+        if entryCacheTimestamp != nil {
+            entryCache[entry.id] = entry
+        }
     }
     
     private func removeCacheEntry(_ entryId: UUID) {
-        entryCache.removeValue(forKey: entryId)
+        // Only remove if cache is valid, otherwise ignore to maintain consistency
+        if entryCacheTimestamp != nil {
+            entryCache.removeValue(forKey: entryId)
+        }
     }
     
     private func processEntryFiles(_ fileURLs: [URL]) async throws -> [WritingEntryDTO] {
