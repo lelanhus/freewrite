@@ -2,8 +2,7 @@ import SwiftUI
 
 struct ChatMenu: View {
     let text: String
-    @Binding var didCopyPrompt: Bool
-    @Binding var showingChatMenu: Bool
+    @Bindable var uiState: UIStateManager
     
     let onOpenChatGPT: () -> Void
     let onOpenClaude: () -> Void
@@ -22,7 +21,7 @@ struct ChatMenu: View {
                     .padding(.vertical, 8)
             } else {
                 Button(action: {
-                    showingChatMenu = false
+                    uiState.closeChatMenu()
                     onOpenChatGPT()
                 }) {
                     Text("ChatGPT")
@@ -36,7 +35,7 @@ struct ChatMenu: View {
                 Divider()
                 
                 Button(action: {
-                    showingChatMenu = false
+                    uiState.closeChatMenu()
                     onOpenClaude()
                 }) {
                     Text("Claude")
@@ -51,9 +50,9 @@ struct ChatMenu: View {
                 
                 Button(action: {
                     onCopyPrompt()
-                    didCopyPrompt = true
+                    uiState.didCopyPrompt = true
                 }) {
-                    Text(didCopyPrompt ? "Copied!" : "Copy Prompt")
+                    Text(uiState.didCopyPrompt ? "Copied!" : "Copy Prompt")
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal, 12)
                         .padding(.vertical, 8)
@@ -66,9 +65,9 @@ struct ChatMenu: View {
         .background(FreewriteColors.popoverBackground)
         .cornerRadius(8)
         .shadow(color: Color.black.opacity(0.1), radius: 4, y: 2)
-        .onChange(of: showingChatMenu) { _, newValue in
+        .onChange(of: uiState.showingChatMenu) { _, newValue in
             if !newValue {
-                didCopyPrompt = false
+                uiState.didCopyPrompt = false
             }
         }
     }

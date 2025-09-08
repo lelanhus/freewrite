@@ -21,6 +21,9 @@ final class UIStateManager {
     var viewHeight: CGFloat = 0
     var showingChatMenu = false
     var didCopyPrompt: Bool = false
+    
+    // Menu state management to prevent corruption
+    private var menuTransitionInProgress = false
     var isFullscreen = false
     
     // Callback for hover state coordination
@@ -38,6 +41,39 @@ final class UIStateManager {
     
     func getColorSchemeString() -> String {
         return colorSchemeString
+    }
+    
+    // MARK: - Menu State Management
+    
+    func openChatMenu() {
+        guard !menuTransitionInProgress else { return }
+        menuTransitionInProgress = true
+        
+        showingChatMenu = true
+        didCopyPrompt = false
+        
+        // Reset transition flag after brief delay
+        Task {
+            try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 second
+            menuTransitionInProgress = false
+        }
+    }
+    
+    func closeChatMenu() {
+        guard !menuTransitionInProgress else { return }
+        menuTransitionInProgress = true
+        
+        showingChatMenu = false
+        
+        // Reset transition flag after brief delay
+        Task {
+            try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 second
+            menuTransitionInProgress = false
+        }
+    }
+    
+    var canToggleMenu: Bool {
+        return !menuTransitionInProgress
     }
 }
 

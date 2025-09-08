@@ -76,8 +76,9 @@ struct NavigationBar: View {
                 
                 if canUseChat {
                     Button("Chat") {
-                        uiState.showingChatMenu = true
-                        uiState.didCopyPrompt = false
+                        if uiState.canToggleMenu {
+                            uiState.openChatMenu()
+                        }
                     }
                     .buttonStyle(.plain)
                     .navigationButton(isHovering: hoverState.isHoveringChat)
@@ -93,8 +94,7 @@ struct NavigationBar: View {
                     .popover(isPresented: $uiState.showingChatMenu, attachmentAnchor: .point(UnitPoint(x: 0.5, y: 0)), arrowEdge: .top) {
                         ChatMenu(
                             text: text,
-                            didCopyPrompt: $uiState.didCopyPrompt,
-                            showingChatMenu: $uiState.showingChatMenu,
+                            uiState: uiState,
                             onOpenChatGPT: onOpenChatGPT,
                             onOpenClaude: onOpenClaude,
                             onCopyPrompt: onCopyPrompt
