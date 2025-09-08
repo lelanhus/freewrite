@@ -4,6 +4,7 @@ import Foundation
 // MARK: - UI State Manager
 
 @Observable
+@MainActor
 final class UIStateManager {
     var selectedFont: String = "Lato-Regular"
     var fontSize: CGFloat = 18
@@ -33,6 +34,7 @@ final class UIStateManager {
 // MARK: - Hover State Manager
 
 @Observable
+@MainActor
 final class HoverStateManager {
     var isHoveringTimer = false
     var isHoveringBottomNav = false
@@ -62,6 +64,7 @@ final class HoverStateManager {
 // MARK: - Typography State Manager
 
 @Observable
+@MainActor
 final class TypographyStateManager {
     var selectedFont: String = FontConstants.defaultFont
     var fontSize: CGFloat = FontConstants.defaultSize
