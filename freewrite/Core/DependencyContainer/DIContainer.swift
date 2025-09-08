@@ -66,16 +66,12 @@ final class DIContainer: Sendable {
     }
     
     private func registerExportServiceWithFallback() {
+        // Break potential dependency cycle by using lazy resolution
         services.register(
             ExportServiceProtocol.self,
-            factory: { [weak self] in
-                // Attempt to create full-featured export service
-                if let fileService = self?.services.resolve(FileManagementServiceProtocol.self) {
-                    return PDFExportService(fileService: fileService)
-                }
-                
-                print("INFO: Using no-op export service for graceful degradation")
-                return NoOpExportService()
+            factory: {
+                // Create export service with lazy file service injection to prevent cycles
+                return LazyPDFExportService()
             }
         )
     }
@@ -113,6 +109,36 @@ final class NoOpExportService: ExportServiceProtocol {
     
     func suggestedFilename(for entryId: UUID, format: ExportFormat) async throws -> String {
         return "export-unavailable"
+    }
+}
+
+/// Lazy PDF export service to break dependency cycles
+final class LazyPDFExportService: ExportServiceProtocol {
+    private lazy var underlyingService: ExportServiceProtocol = {
+        // Lazy resolution prevents dependency cycles during initialization
+        do {
+            let fileService = try DIContainer.shared.resolveSafe(FileManagementServiceProtocol.self)
+            return PDFExportService(fileService: fileService)
+        } catch {
+            print("WARNING: Failed to resolve FileManagementService for export, using no-op service")
+            return NoOpExportService()
+        }
+    }()
+    
+    func exportToPDF(entryId: UUID, settings: PDFExportSettings) async throws -> Data {
+        return try await underlyingService.exportToPDF(entryId: entryId, settings: settings)
+    }
+    
+    func exportToText(entryId: UUID) async throws -> String {
+        return try await underlyingService.exportToText(entryId: entryId)
+    }
+    
+    func exportToMarkdown(entryId: UUID) async throws -> String {
+        return try await underlyingService.exportToMarkdown(entryId: entryId)
+    }
+    
+    func suggestedFilename(for entryId: UUID, format: ExportFormat) async throws -> String {
+        return try await underlyingService.suggestedFilename(for: entryId, format: format)
     }
 }
 
