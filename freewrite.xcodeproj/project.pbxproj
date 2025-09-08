@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		068B80F3EC89F84CAAB1966D /* TimerServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6264FCC56AC36EF40B7A4E72 /* TimerServiceProtocol.swift */; };
+		069A5E8EE67F12C32AB84BBB /* FileManagementServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 858B40DC2EF0739D4AF076D8 /* FileManagementServiceTests.swift */; };
 		14333F94C44875CF495EFAC6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9230E1B84F9CB5723D08D396 /* Assets.xcassets */; };
 		14A96CD3519D6798C11C511D /* Lato-ThinItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C3A4B4B438DC6893C64FEC9A /* Lato-ThinItalic.ttf */; };
 		1A1D9B2971D271AABA6989EC /* FreewriteTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 875F016C37F8E7BDCD41B92C /* FreewriteTimer.swift */; };
@@ -18,10 +19,14 @@
 		4CC7E84A5EC1373EFC46DD28 /* Lato-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DCF11E472E74AF5F610730E1 /* Lato-Regular.ttf */; };
 		4CFF7BC546E168A372BBB213 /* ErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65FEF6F8EF42BF77B7B2F656 /* ErrorHandling.swift */; };
 		6052C9E6762D478418B980AD /* AIIntegrationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69295D906BBEFD2FE6773AF2 /* AIIntegrationService.swift */; };
+		6B3BD5CADC66EC26D84C23E3 /* FreewriteTimerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A98C6B66F035C0530B93E63 /* FreewriteTimerTests.swift */; };
 		74C2183235442328CEA34244 /* Lato-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7CE1C429577B25F2C145616E /* Lato-Italic.ttf */; };
 		7CD676B68DDA975B5158D93F /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEDCF616EE1F6993836D0BB8 /* ContentView.swift */; };
+		8955A33FE70B04A209AF9DF7 /* freewriteUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DBB6E003AEEBEE410824308 /* freewriteUITestsLaunchTests.swift */; };
 		93AEDF7D00B5E492F39F0DB5 /* ExportServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA2FE8BA310C1BFE8A198B5B /* ExportServiceProtocol.swift */; };
+		983499DC7EAB450A9C40A3BA /* AIIntegrationServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCD8BF40854FE606F01FEA2F /* AIIntegrationServiceTests.swift */; };
 		9AA4265D99627686E3D3693B /* PDFExportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 727881524EBE3AF85305AFDC /* PDFExportService.swift */; };
+		9C4FF9C9E2C405BB157A7C69 /* ReusableComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD2356417E47A890876A4607 /* ReusableComponents.swift */; };
 		A1DEE3C4B2B94759DF2124D1 /* AIIntegrationServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AE40DA70CD04C21BC3C8C01 /* AIIntegrationServiceProtocol.swift */; };
 		AB108C2CF443E01592F83BE7 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14478E4E33268780C5F0DC24 /* Constants.swift */; };
 		AC2A28BDB548B3AB0864E603 /* ColorStrategy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 751C0412F2E2CFF1B4568A47 /* ColorStrategy.swift */; };
@@ -35,11 +40,12 @@
 		C595C7384A49E9683561A6F2 /* default.md in Resources */ = {isa = PBXBuildFile; fileRef = 4061B5C6B4942F7513E06A53 /* default.md */; };
 		C843BC3514D5AAE7610E9E72 /* FileManagementService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 137C6730D72BD223A9825C92 /* FileManagementService.swift */; };
 		D4BDFBBB11D4627036CB9795 /* Lato-BlackItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4FCCBFA180D73BDAA0A1B93E /* Lato-BlackItalic.ttf */; };
+		D8A03913716E9BB9342EE7CA /* freewriteUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2D64BE06A4D02F789E17CEE /* freewriteUITests.swift */; };
 		DF6167F78B54ED956B1E3672 /* DIContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AA059BA6ABF7B6A39C7E82A /* DIContainer.swift */; };
 		E32BC8D4FECD15100DA47FA7 /* Lato-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 347C52F9AB41701D2A1C848B /* Lato-Light.ttf */; };
 		E3DE0287F6C01B867CFB7D8D /* Lato-Thin.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 129573019EF9A9DB6D56EE20 /* Lato-Thin.ttf */; };
 		E4D30B07BEDF2968966CD2DB /* DTOs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F0466EB82402087B49C8D74 /* DTOs.swift */; };
-		FB22593A981852EF87DE67C2 /* swift-testing in Frameworks */ = {isa = PBXBuildFile; productRef = 658EA4CB66BD00D282F4D15B /* swift-testing */; };
+		EC2E6FE766115AA06F55C7F1 /* freewriteTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFC435D41326C9A4D20FDD5C /* freewriteTests.swift */; };
 		FF09D0A48EBF3AA326EED601 /* ScrollableTimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F74AE4FDD163B3A90C11F892 /* ScrollableTimerView.swift */; };
 /* End PBXBuildFile section */
 
@@ -67,7 +73,9 @@
 		1C190C743F912C6C03AF19F5 /* Lato-BoldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-BoldItalic.ttf"; sourceTree = "<group>"; };
 		2AA059BA6ABF7B6A39C7E82A /* DIContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DIContainer.swift; sourceTree = "<group>"; };
 		347C52F9AB41701D2A1C848B /* Lato-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-Light.ttf"; sourceTree = "<group>"; };
+		3DBB6E003AEEBEE410824308 /* freewriteUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = freewriteUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		4061B5C6B4942F7513E06A53 /* default.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = default.md; sourceTree = "<group>"; };
+		4A98C6B66F035C0530B93E63 /* FreewriteTimerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreewriteTimerTests.swift; sourceTree = "<group>"; };
 		4ADE7B9AAE1FB90597028C69 /* Lato-Black.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-Black.ttf"; sourceTree = "<group>"; };
 		4AE40DA70CD04C21BC3C8C01 /* AIIntegrationServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIIntegrationServiceProtocol.swift; sourceTree = "<group>"; };
 		4F0466EB82402087B49C8D74 /* DTOs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DTOs.swift; sourceTree = "<group>"; };
@@ -81,17 +89,22 @@
 		751C0412F2E2CFF1B4568A47 /* ColorStrategy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorStrategy.swift; sourceTree = "<group>"; };
 		7CE1C429577B25F2C145616E /* Lato-Italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-Italic.ttf"; sourceTree = "<group>"; };
 		7FFBE9A5852FF6885F2AD682 /* FileManagementServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileManagementServiceProtocol.swift; sourceTree = "<group>"; };
+		858B40DC2EF0739D4AF076D8 /* FileManagementServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileManagementServiceTests.swift; sourceTree = "<group>"; };
 		875F016C37F8E7BDCD41B92C /* FreewriteTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreewriteTimer.swift; sourceTree = "<group>"; };
 		87EA0B0E53A9285554C87559 /* OFL.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = OFL.txt; sourceTree = "<group>"; };
 		9230E1B84F9CB5723D08D396 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		9B73308BD7D863955E7D7547 /* Lato-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-Bold.ttf"; sourceTree = "<group>"; };
 		A5AB9FC47C088B4CFBB06208 /* freewrite.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = freewrite.entitlements; sourceTree = "<group>"; };
 		A68B703537F875B6AB55B62F /* UIState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIState.swift; sourceTree = "<group>"; };
+		AFC435D41326C9A4D20FDD5C /* freewriteTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = freewriteTests.swift; sourceTree = "<group>"; };
 		B941C40B51DD5C66A7F320DA /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		BD2356417E47A890876A4607 /* ReusableComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReusableComponents.swift; sourceTree = "<group>"; };
 		BFF35EA7FBE37DC8D5C577FF /* ConstrainedTextEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstrainedTextEditor.swift; sourceTree = "<group>"; };
 		C09265D9DDAFBA94379F65FD /* Lato-LightItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-LightItalic.ttf"; sourceTree = "<group>"; };
 		C3A4B4B438DC6893C64FEC9A /* Lato-ThinItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-ThinItalic.ttf"; sourceTree = "<group>"; };
+		CCD8BF40854FE606F01FEA2F /* AIIntegrationServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIIntegrationServiceTests.swift; sourceTree = "<group>"; };
 		DCF11E472E74AF5F610730E1 /* Lato-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-Regular.ttf"; sourceTree = "<group>"; };
+		E2D64BE06A4D02F789E17CEE /* freewriteUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = freewriteUITests.swift; sourceTree = "<group>"; };
 		E6EF277EF381D8A79886DA5F /* ServiceRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceRegistry.swift; sourceTree = "<group>"; };
 		E997CD72E37171E36D3C15C7 /* FreewriteTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FreewriteTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		EEDCF616EE1F6993836D0BB8 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -99,17 +112,6 @@
 		F74AE4FDD163B3A90C11F892 /* ScrollableTimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollableTimerView.swift; sourceTree = "<group>"; };
 		FA2FE8BA310C1BFE8A198B5B /* ExportServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportServiceProtocol.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
-
-/* Begin PBXFrameworksBuildPhase section */
-		3DD47D9036CE1C5517BC2D94 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				FB22593A981852EF87DE67C2 /* swift-testing in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		0219F2664BDD2CCF47937953 /* Chat */ = {
@@ -120,6 +122,19 @@
 				6C3CCE3A5A5337AE5567E4CF /* Views */,
 			);
 			path = Chat;
+			sourceTree = "<group>";
+		};
+		056554D4A72A5F828F9B173F /* freewriteTests */ = {
+			isa = PBXGroup;
+			children = (
+				EA5DB529F7098699F9CE4BD6 /* Core */,
+				545F94D26DC95BF4027C2B99 /* IntegrationTests */,
+				76787ACD3C1C45D6489AF125 /* Mocks */,
+				4753B03BB469B9B8729CC3C2 /* UITests */,
+				1698D6D020F4DFD0F77B3C5B /* UnitTests */,
+				AFC435D41326C9A4D20FDD5C /* freewriteTests.swift */,
+			);
+			path = freewriteTests;
 			sourceTree = "<group>";
 		};
 		0B9825EB14C9553C3CFCE0BC /* Views */ = {
@@ -144,12 +159,11 @@
 			path = Services;
 			sourceTree = "<group>";
 		};
-		2243D59346CA3D7ED641A461 /* Mocks */ = {
+		1698D6D020F4DFD0F77B3C5B /* UnitTests */ = {
 			isa = PBXGroup;
 			children = (
 			);
-			name = Mocks;
-			path = Tests/Mocks;
+			path = UnitTests;
 			sourceTree = "<group>";
 		};
 		2E90AD2F4C72CA086269D847 /* Models */ = {
@@ -188,12 +202,28 @@
 			path = Implementations;
 			sourceTree = "<group>";
 		};
-		3710EE6AB46C4DD1CAB5C1F5 /* IntegrationTests */ = {
+		39E38BBD3D32E3448A834DA0 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				CCD8BF40854FE606F01FEA2F /* AIIntegrationServiceTests.swift */,
+				858B40DC2EF0739D4AF076D8 /* FileManagementServiceTests.swift */,
+				4A98C6B66F035C0530B93E63 /* FreewriteTimerTests.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		4753B03BB469B9B8729CC3C2 /* UITests */ = {
 			isa = PBXGroup;
 			children = (
 			);
-			name = IntegrationTests;
-			path = Tests/IntegrationTests;
+			path = UITests;
+			sourceTree = "<group>";
+		};
+		545F94D26DC95BF4027C2B99 /* IntegrationTests */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = IntegrationTests;
 			sourceTree = "<group>";
 		};
 		5C37EAD5B07853C231E03DCD /* Protocols */ = {
@@ -214,29 +244,36 @@
 			path = Components;
 			sourceTree = "<group>";
 		};
-		619A9D0196AC64B57008C615 /* UITests */ = {
+		5F4350EC4BD04834B7AB6CD8 /* freewriteUITests */ = {
 			isa = PBXGroup;
 			children = (
+				E2D64BE06A4D02F789E17CEE /* freewriteUITests.swift */,
+				3DBB6E003AEEBEE410824308 /* freewriteUITestsLaunchTests.swift */,
 			);
-			name = UITests;
-			path = Tests/UITests;
+			path = freewriteUITests;
 			sourceTree = "<group>";
 		};
 		67018554969D4B5E0536B1AB = {
 			isa = PBXGroup;
 			children = (
 				F540022350082734E6251437 /* freewrite */,
-				3710EE6AB46C4DD1CAB5C1F5 /* IntegrationTests */,
-				2243D59346CA3D7ED641A461 /* Mocks */,
-				619A9D0196AC64B57008C615 /* UITests */,
-				BA3950078914EB226BC7AA3C /* UnitTests */,
+				056554D4A72A5F828F9B173F /* freewriteTests */,
+				5F4350EC4BD04834B7AB6CD8 /* freewriteUITests */,
 				FCE97D4D8B14F73A5C722004 /* Products */,
 			);
+			sourceTree = "<group>";
+		};
+		678C3C59624F30A5832A2569 /* Macros */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Macros;
 			sourceTree = "<group>";
 		};
 		6B876407792BEA3E43A53B76 /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				BD2356417E47A890876A4607 /* ReusableComponents.swift */,
 				F74AE4FDD163B3A90C11F892 /* ScrollableTimerView.swift */,
 			);
 			path = Components;
@@ -247,6 +284,13 @@
 			children = (
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		76787ACD3C1C45D6489AF125 /* Mocks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Mocks;
 			sourceTree = "<group>";
 		};
 		89F1B389FBE62A70AFA92FED /* History */ = {
@@ -316,14 +360,6 @@
 			path = Models;
 			sourceTree = "<group>";
 		};
-		BA3950078914EB226BC7AA3C /* UnitTests */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = UnitTests;
-			path = Tests/UnitTests;
-			sourceTree = "<group>";
-		};
 		BAD1E0CC5351D847EDC4B017 /* Services */ = {
 			isa = PBXGroup;
 			children = (
@@ -338,6 +374,7 @@
 			children = (
 				985C4DAD7018B6E9E6962DF6 /* DependencyContainer */,
 				F2F38D3527580C8CCA9BF865 /* Extensions */,
+				678C3C59624F30A5832A2569 /* Macros */,
 				8C751DD1F7FBAE93A02519DD /* Models */,
 				BAD1E0CC5351D847EDC4B017 /* Services */,
 			);
@@ -362,6 +399,14 @@
 				0B9825EB14C9553C3CFCE0BC /* Views */,
 			);
 			path = Settings;
+			sourceTree = "<group>";
+		};
+		EA5DB529F7098699F9CE4BD6 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				39E38BBD3D32E3448A834DA0 /* Services */,
+			);
+			path = Core;
 			sourceTree = "<group>";
 		};
 		EB760DE607B47B913DD51DC8 /* Features */ = {
@@ -441,7 +486,6 @@
 			buildConfigurationList = F48FA272EE63B34C7E372CDA /* Build configuration list for PBXNativeTarget "FreewriteTests" */;
 			buildPhases = (
 				D099BC2C6D4376B92A9530FF /* Sources */,
-				3DD47D9036CE1C5517BC2D94 /* Frameworks */,
 			);
 			buildRules = (
 			);
@@ -450,7 +494,6 @@
 			);
 			name = FreewriteTests;
 			packageProductDependencies = (
-				658EA4CB66BD00D282F4D15B /* swift-testing */,
 			);
 			productName = FreewriteTests;
 			productReference = E997CD72E37171E36D3C15C7 /* FreewriteTests.xctest */;
@@ -502,9 +545,6 @@
 			);
 			mainGroup = 67018554969D4B5E0536B1AB;
 			minimizedProjectReferenceProxies = 1;
-			packageReferences = (
-				43CA38FC811F14F8498E7F7F /* XCRemoteSwiftPackageReference "swift-testing" */,
-			);
 			preferredProjectObjectVersion = 54;
 			projectDirPath = "";
 			projectRoot = "";
@@ -545,6 +585,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D8A03913716E9BB9342EE7CA /* freewriteUITests.swift in Sources */,
+				8955A33FE70B04A209AF9DF7 /* freewriteUITestsLaunchTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -566,6 +608,7 @@
 				B2AF61E9490442FFCC6E6052 /* FileManagementServiceProtocol.swift in Sources */,
 				1A1D9B2971D271AABA6989EC /* FreewriteTimer.swift in Sources */,
 				9AA4265D99627686E3D3693B /* PDFExportService.swift in Sources */,
+				9C4FF9C9E2C405BB157A7C69 /* ReusableComponents.swift in Sources */,
 				FF09D0A48EBF3AA326EED601 /* ScrollableTimerView.swift in Sources */,
 				1C59B187AE4A17750BE3EBD6 /* ServiceRegistry.swift in Sources */,
 				068B80F3EC89F84CAAB1966D /* TimerServiceProtocol.swift in Sources */,
@@ -578,6 +621,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				983499DC7EAB450A9C40A3BA /* AIIntegrationServiceTests.swift in Sources */,
+				069A5E8EE67F12C32AB84BBB /* FileManagementServiceTests.swift in Sources */,
+				6B3BD5CADC66EC26D84C23E3 /* FreewriteTimerTests.swift in Sources */,
+				EC2E6FE766115AA06F55C7F1 /* freewriteTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -864,25 +911,6 @@
 			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCRemoteSwiftPackageReference section */
-		43CA38FC811F14F8498E7F7F /* XCRemoteSwiftPackageReference "swift-testing" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/apple/swift-testing";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.7.0;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
-/* Begin XCSwiftPackageProductDependency section */
-		658EA4CB66BD00D282F4D15B /* swift-testing */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 43CA38FC811F14F8498E7F7F /* XCRemoteSwiftPackageReference "swift-testing" */;
-			productName = "swift-testing";
-		};
-/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 5DD83A4C7551F331286C391C /* Project object */;
 }

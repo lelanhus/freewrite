@@ -17,10 +17,7 @@ settings:
     MACOSX_DEPLOYMENT_TARGET: "14.0"
     TARGETED_DEVICE_FAMILY: "1,2"
 
-packages:
-  swift-testing:
-    url: https://github.com/apple/swift-testing
-    from: 0.7.0
+# SwiftTesting is built into Swift 6 - no external package needed
 
 targets:
   Freewrite:
@@ -42,28 +39,24 @@ targets:
         DEVELOPMENT_TEAM: $(DEVELOPMENT_TEAM)
         CODE_SIGN_STYLE: Automatic
         ENABLE_HARDENED_RUNTIME: YES
-        COMBINE_HIDPI_IMAGES: YES
 
   FreewriteTests:
     type: bundle.unit-test
     platform: macOS
     sources:
-      - path: Tests/UnitTests
-      - path: Tests/IntegrationTests
-      - path: Tests/Mocks
+      - path: freewriteTests
+    dependencies:
+      - target: Freewrite
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: io.freewrite.tests
         GENERATE_INFOPLIST_FILE: YES
-    dependencies:
-      - target: Freewrite
-      - package: swift-testing
 
   FreewriteUITests:
     type: bundle.ui-testing
     platform: macOS
     sources:
-      - path: Tests/UITests
+      - path: freewriteUITests
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: io.freewrite.uitests
