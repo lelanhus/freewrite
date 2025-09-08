@@ -10,6 +10,9 @@ final class FileManagementService: FileManagementServiceProtocol {
     private var entryCacheTimestamp: Date?
     private let cacheExpiryInterval: TimeInterval = 30.0 // 30 seconds
     
+    // File operation coordination to prevent corruption
+    private var activeSaveOperations: Set<UUID> = []
+    
     // Cached documents directory for performance
     private lazy var documentsDirectory: URL = {
         let directory = fileManager
@@ -100,17 +103,30 @@ final class FileManagementService: FileManagementServiceProtocol {
     }
     
     func saveEntry(_ entryId: UUID, content: String) async throws {
+        // Prevent concurrent saves to same entry to avoid file corruption
+        guard !activeSaveOperations.contains(entryId) else {
+            throw FreewriteError.fileOperationFailed("Save already in progress for entry: \(entryId)")
+        }
+        
         guard let entry = try await findEntry(entryId) else {
             throw FreewriteError.entryNotFound
         }
         
         let fileURL = documentsDirectory.appendingPathComponent(entry.filename)
         
+        // Mark save operation as active to prevent concurrent writes
+        activeSaveOperations.insert(entryId)
+        
+        defer {
+            // Always cleanup active operation, even if save fails
+            activeSaveOperations.remove(entryId)
+        }
+        
         do {
+            // Atomic file write and cache update
             try content.write(to: fileURL, atomically: true, encoding: .utf8)
-            print("Saved entry: \(entry.filename)")
             
-            // Update cache with modified entry data
+            // Update cache with modified entry data (must be after successful write)
             let updatedEntry = WritingEntryDTO(
                 id: entry.id,
                 filename: entry.filename,
@@ -122,6 +138,8 @@ final class FileManagementService: FileManagementServiceProtocol {
                 modifiedAt: Date()
             )
             updateCacheEntry(updatedEntry)
+            
+            print("Saved entry: \(entry.filename)")
         } catch {
             throw FreewriteError.fileOperationFailed("Failed to save entry: \(error)")
         }
