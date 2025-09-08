@@ -181,12 +181,34 @@ struct ContentView: View {
             return
         }
         
-        text = validationResult.correctedText ?? newValue
+        // Store previous state for potential rollback
+        let previousText = text
+        let processedText = validationResult.correctedText ?? newValue
         
-        // Auto-save with file service
+        // Optimistically update UI state
+        text = processedText
+        
+        // Atomic save with rollback capability
         Task {
-            await saveCurrentText()
+            do {
+                try await saveTextAtomically(processedText, previousState: previousText)
+            } catch {
+                // Critical: Rollback UI state if save failed to prevent data loss illusion
+                await MainActor.run {
+                    text = previousText
+                    print("CRITICAL: Text save failed, rolled back UI state: \(error)")
+                }
+            }
         }
+    }
+    
+    private func saveTextAtomically(_ textContent: String, previousState: String) async throws {
+        guard let currentEntry = await getCurrentEntry() else {
+            throw FreewriteError.entryNotFound
+        }
+        
+        // Attempt atomic save - if this fails, caller will rollback UI state
+        try await fileService.saveEntry(currentEntry.id, content: textContent)
     }
     
     // MARK: - Entry Management
