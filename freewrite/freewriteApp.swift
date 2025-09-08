@@ -7,8 +7,8 @@ struct FreewriteApp: App {
     @State private var isConfigured = false
     
     init() {
-        registerFonts()
         configureDependencies()
+        // Font registration moved to async to prevent startup blocking
     }
     
     var body: some Scene {
@@ -36,7 +36,30 @@ struct FreewriteApp: App {
         .windowResizability(.contentSize)
     }
     
+    private func registerFontsAsync() async {
+        await withCheckedContinuation { continuation in
+            // Move font registration to background queue to prevent startup blocking
+            DispatchQueue.global(qos: .userInitiated).async {
+                guard let fontURL = Bundle.main.url(forResource: "Lato-Regular", withExtension: "ttf") else {
+                    print("Warning: Lato-Regular.ttf not found")
+                    continuation.resume()
+                    return
+                }
+                
+                let success = CTFontManagerRegisterFontsForURL(fontURL as CFURL, .process, nil)
+                if success {
+                    print("Successfully registered Lato-Regular font")
+                } else {
+                    print("Warning: Failed to register Lato-Regular font")
+                }
+                
+                continuation.resume()
+            }
+        }
+    }
+    
     private func registerFonts() {
+        // Legacy synchronous method - kept for compatibility but not used
         guard let fontURL = Bundle.main.url(forResource: "Lato-Regular", withExtension: "ttf") else {
             print("Warning: Lato-Regular.ttf not found")
             return
@@ -51,8 +74,20 @@ struct FreewriteApp: App {
     
     @MainActor
     private func configureServices() async {
-        DIContainer.shared.configure()
+        // Configure services and fonts asynchronously to prevent startup blocking
+        async let fontRegistration: Void = registerFontsAsync()
+        async let containerConfiguration: Void = configureDIContainer()
+        
+        // Wait for both to complete
+        let _ = await fontRegistration
+        let _ = await containerConfiguration
+        
         isConfigured = true
+    }
+    
+    @MainActor
+    private func configureDIContainer() async {
+        DIContainer.shared.configure()
     }
 }
 
