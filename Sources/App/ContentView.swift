@@ -69,8 +69,8 @@ struct ContentView: View {
     
     var body: some View {
         let navHeight: CGFloat = 68
-        let textColor = FreewriteColors.navigationText
-        let textHoverColor = FreewriteColors.navigationTextHover
+        let _ = FreewriteColors.navigationText // TODO: Remove after migration to components
+        let _ = FreewriteColors.navigationTextHover // TODO: Remove after migration to components
         
         HStack(spacing: 0) {
             // Main content - matching original structure exactly
@@ -334,7 +334,7 @@ struct ContentView: View {
                                 }
                                 .popover(isPresented: $showingChatMenu, attachmentAnchor: .point(UnitPoint(x: 0.5, y: 0)), arrowEdge: .top) {
                                     VStack(spacing: 0) {
-                                        let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+                                        let _ = text.trimmingCharacters(in: .whitespacesAndNewlines)
                                         
                                         if text.count < 350 {
                                             Text("Please free write for at minimum 5 minutes first. Then click this. Trust.")
@@ -389,7 +389,7 @@ struct ContentView: View {
                                     .background(FreewriteColors.popoverBackground)
                                     .cornerRadius(8)
                                     .shadow(color: Color.black.opacity(0.1), radius: 4, y: 2)
-                                    .onChange(of: showingChatMenu) { newValue in
+                                    .onChange(of: showingChatMenu) { _, newValue in
                                         if !newValue {
                                             didCopyPrompt = false
                                         }
