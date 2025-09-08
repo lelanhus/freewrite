@@ -228,6 +228,7 @@ struct ContentView: View {
         .onDisappear {
             cleanupTimerSubscription()
             cleanupFullscreenSubscriptions()
+            cleanupKeyboardMonitor()
             // Reset hover states on view disappear to prevent pollution
             hoverState.resetAllHover()
         }
@@ -467,10 +468,13 @@ struct ContentView: View {
     
     // MARK: - Keyboard Shortcut Management
     
+    @State private var keyboardMonitor: Any?
+    
     private func setupKeyboardShortcuts() {
-        // Setup global keyboard monitoring for shortcuts
-        NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
-            let handled = keyboardManager.handleKeyEvent(event)
+        // Setup global keyboard monitoring for shortcuts with proper cleanup
+        keyboardMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak keyboardManager] event in
+            guard let manager = keyboardManager else { return event }
+            let handled = manager.handleKeyEvent(event)
             return handled ? nil : event // Return nil if handled, event if not
         }
         
@@ -523,6 +527,13 @@ struct ContentView: View {
         keyboardManager.onConstrainedPaste = {
             // Handle paste with freewriting constraints
             // Implementation would go here
+        }
+    }
+    
+    private func cleanupKeyboardMonitor() {
+        if let monitor = keyboardMonitor {
+            NSEvent.removeMonitor(monitor)
+            keyboardMonitor = nil
         }
     }
 }
