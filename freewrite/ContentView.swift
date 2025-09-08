@@ -31,7 +31,11 @@ struct ContentView: View {
         
         // Safe service resolution with proper error handling
         do {
-            self.timerService = try DIContainer.shared.resolveSafe(TimerServiceProtocol.self) as! FreewriteTimer
+            let resolvedTimerService = try DIContainer.shared.resolveSafe(TimerServiceProtocol.self)
+            guard let freewriteTimer = resolvedTimerService as? FreewriteTimer else {
+                fatalError("TimerService is not FreewriteTimer implementation. Got: \(type(of: resolvedTimerService))")
+            }
+            self.timerService = freewriteTimer
             self.fileService = try DIContainer.shared.resolveSafe(FileManagementServiceProtocol.self)
             self.aiService = try DIContainer.shared.resolveSafe(AIIntegrationServiceProtocol.self)
         } catch {
