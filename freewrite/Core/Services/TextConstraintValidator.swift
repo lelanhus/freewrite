@@ -94,6 +94,11 @@ struct TextConstraintValidator {
             )
         }
         
+        // Validate text length constraints to prevent performance issues
+        if let lengthValidation = validateTextLength(newText) {
+            return lengthValidation
+        }
+        
         // Ensure the text always starts with two newlines
         let processedText: String
         if !newText.hasPrefix("\n\n") {
@@ -106,6 +111,29 @@ struct TextConstraintValidator {
             correctedText: processedText,
             shouldProvideFeedback: false
         )
+    }
+    
+    /// Validates text length to prevent performance issues
+    /// - Parameter text: The text to validate
+    /// - Returns: ValidationResult if length constraints violated, nil if valid
+    static func validateTextLength(_ text: String) -> TextConstraintValidationResult? {
+        let textLength = text.count
+        
+        // Hard limit - prevent extremely long texts that could cause performance issues
+        if textLength > FreewriteConstants.maximumTextLength {
+            print("WARNING: Text length (\(textLength)) exceeds maximum (\(FreewriteConstants.maximumTextLength))")
+            return .invalid(
+                correctedText: String(text.prefix(FreewriteConstants.maximumTextLength)),
+                shouldProvideFeedback: true
+            )
+        }
+        
+        // Soft warning - log performance warning but allow
+        if textLength > FreewriteConstants.warningTextLength {
+            print("INFO: Large text detected (\(textLength) characters) - may impact performance")
+        }
+        
+        return nil // Length is acceptable
     }
     
     /// Provides user feedback for constraint violations
