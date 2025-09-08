@@ -65,12 +65,12 @@
 **Reasoning:** Creates continuous memory growth during app lifetime  
 **Status:** ✅ **RESOLVED** - Added proper timer subscription lifecycle management
 
-### C08 🔴 NSEvent Monitor Leak
+### C08 ✅ NSEvent Monitor Leak
 **File:** `NavigationBar.swift:70-84`  
 **Issue:** Global event monitor never removed, leaks memory  
 **Fix:** Store monitor reference and remove on cleanup  
 **Reasoning:** System-level resource leak affecting performance  
-**Status:** 🔄
+**Status:** ✅ **RESOLVED** - Added proper NSEvent monitor lifecycle management
 
 ### C09 🔴 Unsafe @AppStorage Threading
 **File:** `ContentView.swift:19`  

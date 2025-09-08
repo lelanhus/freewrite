@@ -17,6 +17,7 @@ struct ContentView: View {
     @State private var hoverState = HoverStateManager()
     @State private var typographyState = TypographyStateManager()
     @State private var timerCancellable: AnyCancellable?
+    @State private var fullscreenCancellables = Set<AnyCancellable>()
     
     @AppStorage("colorScheme") private var colorSchemeString: String = "light"
     
@@ -152,15 +153,11 @@ struct ContentView: View {
             }
             uiState.placeholderText = PlaceholderConstants.random()
             setupTimerSubscription()
+            setupFullscreenSubscriptions()
         }
         .onDisappear {
             cleanupTimerSubscription()
-        }
-        .onReceive(NotificationCenter.default.publisher(for: NSWindow.willEnterFullScreenNotification)) { _ in
-            uiState.isFullscreen = true
-        }
-        .onReceive(NotificationCenter.default.publisher(for: NSWindow.willExitFullScreenNotification)) { _ in
-            uiState.isFullscreen = false
+            cleanupFullscreenSubscriptions()
         }
     }
     
@@ -330,6 +327,30 @@ struct ContentView: View {
     private func cleanupTimerSubscription() {
         timerCancellable?.cancel()
         timerCancellable = nil
+    }
+    
+    // MARK: - Fullscreen Subscription Management
+    
+    private func setupFullscreenSubscriptions() {
+        // Setup fullscreen enter notification
+        NotificationCenter.default
+            .publisher(for: NSWindow.willEnterFullScreenNotification)
+            .sink { _ in
+                uiState.isFullscreen = true
+            }
+            .store(in: &fullscreenCancellables)
+        
+        // Setup fullscreen exit notification  
+        NotificationCenter.default
+            .publisher(for: NSWindow.willExitFullScreenNotification)
+            .sink { _ in
+                uiState.isFullscreen = false
+            }
+            .store(in: &fullscreenCancellables)
+    }
+    
+    private func cleanupFullscreenSubscriptions() {
+        fullscreenCancellables.removeAll()
     }
 }
 
