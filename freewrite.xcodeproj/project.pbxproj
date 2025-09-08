@@ -16,13 +16,13 @@
 		1C59B187AE4A17750BE3EBD6 /* ServiceRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EF277EF381D8A79886DA5F /* ServiceRegistry.swift */; };
 		36A444366E90A73B32A9ECDA /* ChatMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 491FC192C28DBF1ED4D554F9 /* ChatMenu.swift */; };
 		38AAFADFCB4A0CE0425CCF5B /* Lato-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1C190C743F912C6C03AF19F5 /* Lato-BoldItalic.ttf */; };
+		3A71502540B3B3A51C5A797D /* StateManagers.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDF7F78E5A076C9D0F12DAEA /* StateManagers.swift */; };
 		3D50860F25B38DA202850B87 /* FontControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C5898BAF4655E386AD1580B /* FontControls.swift */; };
 		40978D4D9636F15D69883052 /* OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = 87EA0B0E53A9285554C87559 /* OFL.txt */; };
 		4CC7E84A5EC1373EFC46DD28 /* Lato-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DCF11E472E74AF5F610730E1 /* Lato-Regular.ttf */; };
 		4CFF7BC546E168A372BBB213 /* ErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65FEF6F8EF42BF77B7B2F656 /* ErrorHandling.swift */; };
 		6052C9E6762D478418B980AD /* AIIntegrationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69295D906BBEFD2FE6773AF2 /* AIIntegrationService.swift */; };
 		6B3BD5CADC66EC26D84C23E3 /* FreewriteTimerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A98C6B66F035C0530B93E63 /* FreewriteTimerTests.swift */; };
-		6B7B1EB8B830431F95EE8383 /* ContentViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2E3E196BA327A817CAB72E5 /* ContentViewModel.swift */; };
 		74C2183235442328CEA34244 /* Lato-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7CE1C429577B25F2C145616E /* Lato-Italic.ttf */; };
 		7CD676B68DDA975B5158D93F /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEDCF616EE1F6993836D0BB8 /* ContentView.swift */; };
 		8955A33FE70B04A209AF9DF7 /* freewriteUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DBB6E003AEEBEE410824308 /* freewriteUITestsLaunchTests.swift */; };
@@ -107,12 +107,12 @@
 		A68B703537F875B6AB55B62F /* UIState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIState.swift; sourceTree = "<group>"; };
 		AFC435D41326C9A4D20FDD5C /* freewriteTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = freewriteTests.swift; sourceTree = "<group>"; };
 		B941C40B51DD5C66A7F320DA /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		BDF7F78E5A076C9D0F12DAEA /* StateManagers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StateManagers.swift; sourceTree = "<group>"; };
 		BFF35EA7FBE37DC8D5C577FF /* ConstrainedTextEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstrainedTextEditor.swift; sourceTree = "<group>"; };
 		C09265D9DDAFBA94379F65FD /* Lato-LightItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-LightItalic.ttf"; sourceTree = "<group>"; };
 		C3A4B4B438DC6893C64FEC9A /* Lato-ThinItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-ThinItalic.ttf"; sourceTree = "<group>"; };
 		CA7CD69E5602F6DA1A2B09A7 /* Sidebar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sidebar.swift; sourceTree = "<group>"; };
 		CCD8BF40854FE606F01FEA2F /* AIIntegrationServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIIntegrationServiceTests.swift; sourceTree = "<group>"; };
-		D2E3E196BA327A817CAB72E5 /* ContentViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentViewModel.swift; sourceTree = "<group>"; };
 		DCF11E472E74AF5F610730E1 /* Lato-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-Regular.ttf"; sourceTree = "<group>"; };
 		E2D64BE06A4D02F789E17CEE /* freewriteUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = freewriteUITests.swift; sourceTree = "<group>"; };
 		E6EF277EF381D8A79886DA5F /* ServiceRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceRegistry.swift; sourceTree = "<group>"; };
@@ -174,14 +174,6 @@
 			children = (
 			);
 			path = UnitTests;
-			sourceTree = "<group>";
-		};
-		1AD2042299C0752E5E8BACEF /* ViewModels */ = {
-			isa = PBXGroup;
-			children = (
-				D2E3E196BA327A817CAB72E5 /* ContentViewModel.swift */,
-			);
-			path = ViewModels;
 			sourceTree = "<group>";
 		};
 		1BBE6FB8C2913FC07D30F940 /* Views */ = {
@@ -345,6 +337,7 @@
 				14478E4E33268780C5F0DC24 /* Constants.swift */,
 				4F0466EB82402087B49C8D74 /* DTOs.swift */,
 				65FEF6F8EF42BF77B7B2F656 /* ErrorHandling.swift */,
+				BDF7F78E5A076C9D0F12DAEA /* StateManagers.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -470,7 +463,6 @@
 				EB760DE607B47B913DD51DC8 /* Features */,
 				2F34CA8115599F72E42A107B /* fonts */,
 				9F387F5C8A852C7C7A27B17B /* Preview Content */,
-				1AD2042299C0752E5E8BACEF /* ViewModels */,
 				1BBE6FB8C2913FC07D30F940 /* Views */,
 				9230E1B84F9CB5723D08D396 /* Assets.xcassets */,
 				EEDCF616EE1F6993836D0BB8 /* ContentView.swift */,
@@ -641,7 +633,6 @@
 				1B1B1204C6DA54BEFD0EFBEE /* ConstrainedTextEditor.swift in Sources */,
 				B44AE41982AE792976176ED2 /* ContentView+Extensions.swift in Sources */,
 				7CD676B68DDA975B5158D93F /* ContentView.swift in Sources */,
-				6B7B1EB8B830431F95EE8383 /* ContentViewModel.swift in Sources */,
 				DF6167F78B54ED956B1E3672 /* DIContainer.swift in Sources */,
 				E4D30B07BEDF2968966CD2DB /* DTOs.swift in Sources */,
 				4CFF7BC546E168A372BBB213 /* ErrorHandling.swift in Sources */,
@@ -655,6 +646,7 @@
 				FF09D0A48EBF3AA326EED601 /* ScrollableTimerView.swift in Sources */,
 				1C59B187AE4A17750BE3EBD6 /* ServiceRegistry.swift in Sources */,
 				B8A1FA41CB18F78D40019A02 /* Sidebar.swift in Sources */,
+				3A71502540B3B3A51C5A797D /* StateManagers.swift in Sources */,
 				068B80F3EC89F84CAAB1966D /* TimerServiceProtocol.swift in Sources */,
 				B765C7468702065E9B97FBE3 /* UIState.swift in Sources */,
 				C54DDBBF284C0983EDCEF7AF /* freewriteApp.swift in Sources */,

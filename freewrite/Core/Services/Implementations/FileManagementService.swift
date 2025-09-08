@@ -5,6 +5,11 @@ import Foundation
 final class FileManagementService: FileManagementServiceProtocol {
     private let fileManager = FileManager.default
     
+    // Entry caching for performance
+    private var entryCache: [UUID: WritingEntryDTO] = [:]
+    private var entryCacheTimestamp: Date?
+    private let cacheExpiryInterval: TimeInterval = 30.0 // 30 seconds
+    
     // Cached documents directory for performance
     private lazy var documentsDirectory: URL = {
         let directory = fileManager
@@ -56,6 +61,9 @@ final class FileManagementService: FileManagementServiceProtocol {
         do {
             try initialContent.write(to: fileURL, atomically: true, encoding: .utf8)
             print("Created new entry: \(filename)")
+            
+            // Update cache with new entry
+            updateCacheEntry(entry)
         } catch {
             throw FreewriteError.fileOperationFailed("Failed to create entry: \(error)")
         }
@@ -89,6 +97,19 @@ final class FileManagementService: FileManagementServiceProtocol {
         do {
             try content.write(to: fileURL, atomically: true, encoding: .utf8)
             print("Saved entry: \(entry.filename)")
+            
+            // Update cache with modified entry data
+            let updatedEntry = WritingEntryDTO(
+                id: entry.id,
+                filename: entry.filename,
+                displayDate: entry.displayDate,
+                previewText: extractPreviewText(from: content),
+                wordCount: calculateWordCount(content),
+                isWelcomeEntry: entry.isWelcomeEntry,
+                createdAt: entry.createdAt,
+                modifiedAt: Date()
+            )
+            updateCacheEntry(updatedEntry)
         } catch {
             throw FreewriteError.fileOperationFailed("Failed to save entry: \(error)")
         }
@@ -104,12 +125,26 @@ final class FileManagementService: FileManagementServiceProtocol {
         do {
             try fileManager.removeItem(at: fileURL)
             print("Deleted entry: \(entry.filename)")
+            
+            // Remove from cache
+            removeCacheEntry(entryId)
         } catch {
             throw FreewriteError.fileOperationFailed("Failed to delete entry: \(error)")
         }
     }
     
     func loadAllEntries() async throws -> [WritingEntryDTO] {
+        // Return cached entries if available and valid
+        if isCacheValid(), !entryCache.isEmpty {
+            return Array(entryCache.values).sorted { $0.createdAt > $1.createdAt }
+        }
+        
+        // Cache miss or expired, refresh cache
+        try await refreshEntryCache()
+        return Array(entryCache.values).sorted { $0.createdAt > $1.createdAt }
+    }
+    
+    private func loadAllEntriesFromDisk() async throws -> [WritingEntryDTO] {
         do {
             let fileURLs = try fileManager.contentsOfDirectory(
                 at: documentsDirectory,
@@ -153,8 +188,50 @@ final class FileManagementService: FileManagementServiceProtocol {
     // MARK: - Private Methods
     
     private func findEntry(_ entryId: UUID) async throws -> WritingEntryDTO? {
-        let entries = try await loadAllEntries()
-        return entries.first { $0.id == entryId }
+        // Try to get from cache first
+        if let cachedEntry = getCachedEntry(entryId) {
+            return cachedEntry
+        }
+        
+        // Cache miss, refresh cache and try again
+        try await refreshEntryCache()
+        return getCachedEntry(entryId)
+    }
+    
+    // MARK: - Cache Management
+    
+    private func getCachedEntry(_ entryId: UUID) -> WritingEntryDTO? {
+        guard isCacheValid() else { return nil }
+        return entryCache[entryId]
+    }
+    
+    private func isCacheValid() -> Bool {
+        guard let timestamp = entryCacheTimestamp else { return false }
+        return Date().timeIntervalSince(timestamp) < cacheExpiryInterval
+    }
+    
+    private func refreshEntryCache() async throws {
+        let entries = try await loadAllEntriesFromDisk()
+        entryCache.removeAll()
+        
+        for entry in entries {
+            entryCache[entry.id] = entry
+        }
+        
+        entryCacheTimestamp = Date()
+    }
+    
+    private func invalidateCache() {
+        entryCache.removeAll()
+        entryCacheTimestamp = nil
+    }
+    
+    private func updateCacheEntry(_ entry: WritingEntryDTO) {
+        entryCache[entry.id] = entry
+    }
+    
+    private func removeCacheEntry(_ entryId: UUID) {
+        entryCache.removeValue(forKey: entryId)
     }
     
     private func processEntryFiles(_ fileURLs: [URL]) async throws -> [WritingEntryDTO] {
