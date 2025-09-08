@@ -44,18 +44,23 @@ The app implements the freewriting methodology developed in 1973 - continuous wr
 
 ## Modern Architecture (Swift 6+)
 
-**Minimal Feature Structure:**
+**Current Feature Structure:**
 ```
-Sources/
-├── App/                    # App entry point
-│   ├── freewriteApp.swift  # Main app with DI configuration
-│   └── ContentView.swift   # Primary thinking interface
+freewrite/
+├── freewriteApp.swift      # Main app with DI configuration
+├── ContentView.swift       # Primary thinking interface
 ├── Core/                   # Essential business logic only
 │   ├── DependencyContainer/# DI system
-│   ├── Models/            # DTOs, Constants, Errors
+│   ├── Models/            # DTOs, Constants, Errors, State
 │   └── Services/          # Core services only
-└── Features/              # Minimal feature modules
-    └── Writing/           # Core thinking interface only
+├── Features/              # Minimal feature modules
+│   └── Writing/           # Core thinking interface only
+├── Views/                 # UI components
+│   ├── NavigationBar.swift
+│   ├── FontControls.swift
+│   ├── ChatMenu.swift
+│   └── Sidebar.swift
+└── Extensions/            # Helper functions
 ```
 
 **Core Services (Essential Only):**
@@ -92,16 +97,19 @@ Sources/
 
 ## Swift 6 Concurrency Guidelines
 
-**Actor Isolation:**
-- All ViewModels: `@MainActor @Observable final class`
-- Service protocols: `@MainActor protocol ServiceProtocol: Sendable`
-- File operations: Properly isolated async methods
-- Timer operations: Main actor for UI integration
+**Current Architecture:**
+- **No ViewModels**: ContentView directly uses services (aligns with minimal philosophy)
+- **State Managers**: Simple `@Observable` classes for UI state organization
+- **Service protocols**: `@MainActor protocol ServiceProtocol: Sendable`
+- **File operations**: Async methods with basic safety checks
+- **Timer operations**: Main actor for UI integration
 
-**Sendable Compliance:**
-- DTOs: All `Sendable` structs with immutable data
-- Services: `@unchecked Sendable` where thread-safety is ensured
-- Containers: NSLock-based thread safety in ServiceRegistry
+**Simplicity Guidelines:**
+- **Avoid over-engineering**: Simple solutions for simple problems
+- **No elaborate patterns**: Keep architecture minimal and focused
+- **Essential safety only**: Memory leaks and crash protection without complexity
+- **DTOs**: All `Sendable` structs with immutable data
+- **Services**: Basic implementations without unnecessary abstractions
 
 ## Development Guidelines
 
@@ -143,6 +151,23 @@ Sources/
 - Rich text editing or markdown support
 
 The app should feel like **digital paper with a timer** - simple, reliable, invisible until the thinking is done.
+
+## Recent Architecture Improvements
+
+**Essential Safety Fixes Applied (2024):**
+- **Memory leak prevention**: Proper cleanup of NotificationCenter observers, timers, and monitors
+- **Crash protection**: Basic safety checks for directory access and file operations
+- **State management**: Simple `@Observable` state managers without over-engineering
+- **Mock services**: Organized testing infrastructure in Tests/Mocks/
+- **Constraint validation**: TextConstraintValidator for freewriting methodology enforcement
+
+**Philosophy Maintained:**
+- No elaborate caching systems or enterprise patterns
+- No complex monitoring or coordination infrastructure  
+- No development documentation files in production code
+- Simple solutions that preserve the "dumb little app" character
+
+**Key Learning: Avoid over-engineering** - The app's beauty lies in its simplicity, not technical sophistication.
 
 ## Project Management
 
