@@ -11,7 +11,7 @@ final class UserPreferences {
     var defaultTimerDuration: Int = FreewriteConstants.defaultTimerDuration {
         didSet {
             // Validate timer bounds for methodology effectiveness
-            defaultTimerDuration = max(300, min(defaultTimerDuration, FreewriteConstants.maxTimerDuration))
+            defaultTimerDuration = max(ProgressiveDisclosureConstants.defaultMinimumSessionLength, min(defaultTimerDuration, FreewriteConstants.maxTimerDuration))
         }
     }
     
@@ -22,13 +22,13 @@ final class UserPreferences {
     // MARK: - Constraint Preferences (Therapeutic Efficacy)
     
     var constraintLevel: ConstraintLevel = .standard
-    var backspaceGracePeriod: Double = 0.0 { // Seconds of backspace tolerance
+    var backspaceGracePeriod: Double = ProgressiveDisclosureConstants.minBackspaceGracePeriod { // Seconds of backspace tolerance
         didSet {
             // Maintain freewriting methodology integrity
-            backspaceGracePeriod = max(0.0, min(backspaceGracePeriod, 3.0))
+            backspaceGracePeriod = max(ProgressiveDisclosureConstants.minBackspaceGracePeriod, min(backspaceGracePeriod, ProgressiveDisclosureConstants.maxBackspaceGracePeriod))
         }
     }
-    var minimumSessionLength: Int = 300 // 5 minutes minimum for effectiveness
+    var minimumSessionLength: Int = ProgressiveDisclosureConstants.defaultMinimumSessionLength // 5 minutes minimum for effectiveness
     
     // MARK: - AI Analysis Preferences
     
@@ -42,7 +42,7 @@ final class UserPreferences {
     var defaultToDistractionFree: Bool = false
     var showWordCountDuringSession: Bool = false
     var typingMomentumFeedback: Bool = false
-    var sessionCount: Int = 0 // Track user experience level
+    var sessionCount: Int = PerformanceConstants.initialErrorCount // Track user experience level
     
     // MARK: - Preference Categories
     
@@ -99,44 +99,44 @@ final class UserPreferences {
                 title: "Default Timer",
                 description: "How long should sessions last?",
                 category: .essential,
-                minimumSessionsToShow: 1
+                minimumSessionsToShow: ProgressiveDisclosureConstants.essentialSettingsThreshold
             ),
             SettingItem(
                 key: "sound",
                 title: "Timer Sound", 
                 description: "Sound when session completes",
                 category: .essential,
-                minimumSessionsToShow: 1
+                minimumSessionsToShow: ProgressiveDisclosureConstants.essentialSettingsThreshold
             ),
             SettingItem(
                 key: "constraints",
                 title: "Writing Constraints",
                 description: "How strict should the no-editing rules be?", 
                 category: .essential,
-                minimumSessionsToShow: 3
+                minimumSessionsToShow: ProgressiveDisclosureConstants.basicConstraintsThreshold
             ),
             
             // Methodology (show after 5 sessions)
             SettingItem(
                 key: "gracePeriod",
                 title: "Typo Grace Period",
-                description: "Allow backspace for immediate typos (0-3 seconds)",
+                description: "Allow backspace for immediate typos (0-\(Int(ProgressiveDisclosureConstants.maxBackspaceGracePeriod)) seconds)",
                 category: .methodology,
-                minimumSessionsToShow: 5
+                minimumSessionsToShow: ProgressiveDisclosureConstants.methodologySettingsThreshold
             ),
             SettingItem(
                 key: "autoStart",
                 title: "Auto-Start Timer",
                 description: "Start timer automatically with new sessions",
                 category: .methodology, 
-                minimumSessionsToShow: 5
+                minimumSessionsToShow: ProgressiveDisclosureConstants.methodologySettingsThreshold
             ),
             SettingItem(
                 key: "minimumLength",
                 title: "Minimum Session",
                 description: "Enforce minimum writing time",
                 category: .methodology,
-                minimumSessionsToShow: 10
+                minimumSessionsToShow: ProgressiveDisclosureConstants.advancedMethodologyThreshold
             ),
             
             // AI (show after 10 sessions)
@@ -145,21 +145,21 @@ final class UserPreferences {
                 title: "AI Analysis Style",
                 description: "How should AI respond to your writing?",
                 category: .ai,
-                minimumSessionsToShow: 10
+                minimumSessionsToShow: ProgressiveDisclosureConstants.aiSettingsThreshold
             ),
             SettingItem(
                 key: "autoAnalysis", 
                 title: "Auto-Open Analysis",
                 description: "Automatically open AI analysis after sessions",
                 category: .ai,
-                minimumSessionsToShow: 10
+                minimumSessionsToShow: ProgressiveDisclosureConstants.aiSettingsThreshold
             ),
             SettingItem(
                 key: "privacyMode",
                 title: "Privacy Mode",
                 description: "Never auto-open external URLs",
                 category: .ai,
-                minimumSessionsToShow: 15
+                minimumSessionsToShow: ProgressiveDisclosureConstants.privacySettingsThreshold
             )
         ]
         

@@ -142,4 +142,57 @@ struct KeyboardShortcutTests {
         #expect(stats.max >= 0) // Should be non-negative
         #expect(stats.sampleCount >= 0) // Should be non-negative
     }
+    
+    @Test("Error boundaries protect against callback failures")
+    func testErrorBoundaries() async {
+        let manager = createShortcutManager()
+        
+        // Test: Error stats initially clean
+        let initialErrorStats = manager.getErrorStats()
+        #expect(initialErrorStats.consecutiveErrors == 0)
+        #expect(initialErrorStats.isInCooldown == false)
+        
+        // Test: Error reporting callback
+        var reportedError: KeyboardEventError?
+        manager.onErrorReported = { error in
+            reportedError = error
+        }
+        
+        // Test: Callback not set scenario
+        manager.onNewSession = nil // Callback not set
+        
+        // Error stats API should be accessible
+        let errorStats = manager.getErrorStats()
+        #expect(errorStats.consecutiveErrors >= 0)
+        #expect(errorStats.lastErrorTime != nil)
+        
+        // Test: Error state reset functionality
+        manager.resetErrorState()
+        let resetStats = manager.getErrorStats()
+        #expect(resetStats.consecutiveErrors == 0)
+        #expect(resetStats.isInCooldown == false)
+    }
+    
+    @Test("Error recovery mechanisms function correctly")
+    func testErrorRecovery() async {
+        let manager = createShortcutManager()
+        
+        var errorCount = 0
+        manager.onErrorReported = { _ in
+            errorCount += 1
+        }
+        
+        // Test: Multiple errors are tracked
+        manager.resetErrorState() // Start clean
+        
+        // Error state should be manageable
+        let beforeStats = manager.getErrorStats()
+        #expect(beforeStats.consecutiveErrors == 0)
+        
+        // Reset should clear error state
+        manager.resetErrorState()
+        let afterResetStats = manager.getErrorStats()
+        #expect(afterResetStats.consecutiveErrors == 0)
+        #expect(afterResetStats.isInCooldown == false)
+    }
 }

@@ -15,13 +15,22 @@ final class KeyboardShortcutManager: @unchecked Sendable {
     
     private var currentTypingState: TypingState = .idle
     private var lastKeystrokeTime: Date = Date.distantPast
-    private let flowStateThreshold: TimeInterval = 10.0 // 10 seconds of continuous typing = flow
+    private let flowStateThreshold: TimeInterval = KeyboardShortcutConstants.flowStateThreshold
     
     // MARK: - Performance Monitoring
     
     private var keyEventProcessingTimes: [TimeInterval] = []
-    private let maxPerformanceSamples = 100 // Keep last 100 samples
-    private var performanceWarningThreshold: TimeInterval = 0.002 // 2ms threshold
+    private let maxPerformanceSamples = KeyboardShortcutConstants.maxPerformanceSamples
+    private var performanceWarningThreshold: TimeInterval = KeyboardShortcutConstants.performanceWarningThreshold
+    
+    // MARK: - Error Handling
+    
+    private var consecutiveErrors = PerformanceConstants.initialErrorCount
+    private let maxConsecutiveErrors = KeyboardShortcutConstants.maxConsecutiveErrors
+    private var lastErrorTime: Date = Date.distantPast
+    private let errorCooldownPeriod: TimeInterval = KeyboardShortcutConstants.errorCooldownPeriod
+    
+    var onErrorReported: ((KeyboardEventError) -> Void)?
     
     // MARK: - Shortcut Action Handlers
     
@@ -46,7 +55,7 @@ final class KeyboardShortcutManager: @unchecked Sendable {
         
         // Auto-detect flow state based on continuous typing
         let timeSinceLastKeystroke = Date().timeIntervalSince(lastKeystrokeTime)
-        if timeSinceLastKeystroke < 2.0 && currentTypingState != .activeFlow {
+        if timeSinceLastKeystroke < KeyboardShortcutConstants.typingContinuityThreshold && currentTypingState != .activeFlow {
             // Continuous typing detected - likely entering flow
             currentTypingState = .typing
         }
@@ -59,15 +68,32 @@ final class KeyboardShortcutManager: @unchecked Sendable {
             recordPerformanceMetric(processingTime)
         }
         
+        do {
+            return try handleKeyEventSafely(event)
+        } catch {
+            handleKeyboardError(error, event: event)
+            return false // Fail safely - don't break typing flow
+        }
+    }
+    
+    private func handleKeyEventSafely(_ event: NSEvent) throws -> Bool {
         guard event.type == .keyDown else { return false }
-        guard let characters = event.charactersIgnoringModifiers else { return false }
         
-        // Update typing state
-        updateTypingActivity()
+        // Validate event data before processing
+        guard let characters = event.charactersIgnoringModifiers, !characters.isEmpty else {
+            throw KeyboardEventError.invalidEventData("Missing or empty characters")
+        }
         
-        // Handle command shortcuts
+        // Update typing state with error boundary
+        do {
+            updateTypingActivity()
+        } catch {
+            throw KeyboardEventError.stateUpdateFailed("Failed to update typing activity: \(error)")
+        }
+        
+        // Handle command shortcuts with error boundary
         if event.modifierFlags.contains(.command) {
-            return handleCommandShortcut(characters, event: event)
+            return try handleCommandShortcutSafely(characters, event: event)
         }
         
         return false // Not handled
@@ -137,7 +163,7 @@ final class KeyboardShortcutManager: @unchecked Sendable {
             
         // MARK: System Shortcuts (Allow)
         case "w", "q", "m":
-            // Window, Quit, Minimize - let system handle
+            // System shortcuts - let system handle
             return false
             
         case ",":
@@ -152,7 +178,7 @@ final class KeyboardShortcutManager: @unchecked Sendable {
     
     private func isEmergencyShortcut(_ key: String) -> Bool {
         // Emergency shortcuts that work even during flow state
-        return ["d", "w", "q"].contains(key.lowercased())
+        return KeyboardShortcutConstants.emergencyShortcuts.contains(key.lowercased())
     }
     
     // MARK: - Performance Monitoring
@@ -167,20 +193,136 @@ final class KeyboardShortcutManager: @unchecked Sendable {
         
         // Log warning if processing is slow (could interrupt typing flow)
         if processingTime > performanceWarningThreshold {
-            print("⚠️ Keyboard event processing slow: \(String(format: "%.3f", processingTime * 1000))ms")
+            let formattedTime = String(format: KeyboardShortcutConstants.timingFormatPrecision, processingTime * KeyboardShortcutConstants.millisecondsMultiplier)
+            print("⚠️ Keyboard event processing slow: \(formattedTime)ms")
         }
     }
     
     func getPerformanceStats() -> (average: TimeInterval, max: TimeInterval, sampleCount: Int) {
         guard !keyEventProcessingTimes.isEmpty else {
-            return (average: 0, max: 0, sampleCount: 0)
+            return (average: TimeInterval(PerformanceConstants.zeroValue), max: TimeInterval(PerformanceConstants.zeroValue), sampleCount: PerformanceConstants.emptyCount)
         }
         
-        let sum = keyEventProcessingTimes.reduce(0, +)
+        let sum = keyEventProcessingTimes.reduce(TimeInterval(PerformanceConstants.zeroValue), +)
         let average = sum / Double(keyEventProcessingTimes.count)
-        let max = keyEventProcessingTimes.max() ?? 0
+        let max = keyEventProcessingTimes.max() ?? TimeInterval(PerformanceConstants.zeroValue)
         
         return (average: average, max: max, sampleCount: keyEventProcessingTimes.count)
+    }
+    
+    // MARK: - Error Handling Methods
+    
+    private func handleCommandShortcutSafely(_ key: String, event: NSEvent) throws -> Bool {
+        // Check for flow state protection
+        if currentTypingState == .activeFlow && !isEmergencyShortcut(key) {
+            return false
+        }
+        
+        guard !key.isEmpty else {
+            throw KeyboardEventError.invalidEventData("Empty key string")
+        }
+        
+        let lowerKey = key.lowercased()
+        
+        switch lowerKey {
+        case "n":
+            try executeCallbackSafely(onNewSession, shortcut: "⌘N")
+            return true
+        case "t":
+            try executeCallbackSafely(onTimerToggle, shortcut: "⌘T")
+            return true
+        case "d":
+            try executeCallbackSafely(onToggleDistractionFree, shortcut: "⌘D")
+            return true
+        case "z":
+            try executeCallbackSafely({ self.onConstraintViolation?("Undo blocked - freewriting constraints active") }, shortcut: "⌘Z")
+            return true
+        case "x":
+            try executeCallbackSafely({ self.onConstraintViolation?("Cut blocked - freewriting constraints active") }, shortcut: "⌘X")
+            return true
+        case "v":
+            try executeCallbackSafely(onConstrainedPaste, shortcut: "⌘V")
+            return true
+        case "c":
+            return false // Let system handle
+        case "e":
+            if !event.modifierFlags.contains(.shift) {
+                try executeCallbackSafely(onExportForAI, shortcut: "⌘E")
+                return true
+            }
+            return false
+        case "o":
+            try executeCallbackSafely(onToggleSidebar, shortcut: "⌘O")
+            return true
+        case "1", "2", "3", "4", "5", "6", "7", "8", "9":
+            guard KeyboardShortcutConstants.validTimerPresetDigits.contains(lowerKey),
+                  let digit = Int(lowerKey) else {
+                throw KeyboardEventError.callbackExecutionFailed("Failed to parse timer preset digit: \(lowerKey)")
+            }
+            let minutes = digit * KeyboardShortcutConstants.timerPresetMultiplier
+            try executeCallbackSafely({ self.onTimerPreset?(minutes) }, shortcut: "⌘\(digit)")
+            return true
+        case "w", "q", "m":
+            return false // Let system handle
+        case ",":
+            try executeCallbackSafely(onOpenSettings, shortcut: "⌘,")
+            return true
+        default:
+            return false
+        }
+    }
+    
+    private func executeCallbackSafely(_ callback: (() -> Void)?, shortcut: String) throws {
+        guard let callback = callback else {
+            throw KeyboardEventError.callbackNotSet("No callback set for shortcut: \(shortcut)")
+        }
+        
+        do {
+            callback()
+        } catch {
+            throw KeyboardEventError.callbackExecutionFailed("Callback execution failed for \(shortcut): \(error)")
+        }
+    }
+    
+    private func handleKeyboardError(_ error: Error, event: NSEvent) {
+        consecutiveErrors += 1
+        lastErrorTime = Date()
+        
+        let keyboardError: KeyboardEventError
+        if let existingError = error as? KeyboardEventError {
+            keyboardError = existingError
+        } else {
+            keyboardError = KeyboardEventError.unexpectedError("Unexpected error: \(error)")
+        }
+        
+        var errorContext = "Event: type=\(event.type.rawValue), modifiers=\(event.modifierFlags.rawValue)"
+        if let chars = event.charactersIgnoringModifiers {
+            errorContext += ", chars='\(chars)'"
+        }
+        errorContext += ", state=\(currentTypingState), errors=\(consecutiveErrors)"
+        
+        print("⚠️ Keyboard event error (\(consecutiveErrors)/\(maxConsecutiveErrors)): \(keyboardError.localizedDescription)")
+        print("📋 Context: \(errorContext)")
+        
+        if consecutiveErrors >= maxConsecutiveErrors {
+            print("🚫 Too many keyboard errors. Temporarily limiting shortcuts.")
+        }
+        
+        onErrorReported?(keyboardError)
+        
+        if Date().timeIntervalSince(lastErrorTime) > errorCooldownPeriod {
+            consecutiveErrors = PerformanceConstants.initialErrorCount
+        }
+    }
+    
+    func getErrorStats() -> (consecutiveErrors: Int, lastErrorTime: Date, isInCooldown: Bool) {
+        let isInCooldown = Date().timeIntervalSince(lastErrorTime) < errorCooldownPeriod
+        return (consecutiveErrors: consecutiveErrors, lastErrorTime: lastErrorTime, isInCooldown: isInCooldown)
+    }
+    
+    func resetErrorState() {
+        consecutiveErrors = PerformanceConstants.initialErrorCount
+        lastErrorTime = Date.distantPast
     }
 }
 
@@ -189,4 +331,45 @@ final class KeyboardShortcutManager: @unchecked Sendable {
 protocol KeyboardShortcutDelegate: AnyObject {
     func shortcutTriggered(_ shortcut: String, context: String)
     func constraintViolationOccurred(_ message: String)
+    func keyboardErrorOccurred(_ error: KeyboardEventError)
+}
+
+// MARK: - Error Types
+
+enum KeyboardEventError: LocalizedError {
+    case invalidEventData(String)
+    case stateUpdateFailed(String)
+    case callbackNotSet(String)
+    case callbackExecutionFailed(String)
+    case unexpectedError(String)
+    
+    var errorDescription: String? {
+        switch self {
+        case .invalidEventData(let message):
+            return "Invalid keyboard event data: \(message)"
+        case .stateUpdateFailed(let message):
+            return "State update failed: \(message)"
+        case .callbackNotSet(let message):
+            return "Callback not set: \(message)"
+        case .callbackExecutionFailed(let message):
+            return "Callback execution failed: \(message)"
+        case .unexpectedError(let message):
+            return "Unexpected keyboard error: \(message)"
+        }
+    }
+    
+    var recoverySuggestion: String? {
+        switch self {
+        case .invalidEventData:
+            return "This usually indicates a system-level keyboard event issue. Try restarting the application."
+        case .stateUpdateFailed:
+            return "The keyboard state manager encountered an error. Typing should continue to work normally."
+        case .callbackNotSet:
+            return "A keyboard shortcut was triggered but no handler was configured. This is a development issue."
+        case .callbackExecutionFailed:
+            return "A keyboard shortcut handler failed to execute. The shortcut will be temporarily disabled."
+        case .unexpectedError:
+            return "An unexpected error occurred. Keyboard shortcuts will be temporarily disabled for safety."
+        }
+    }
 }

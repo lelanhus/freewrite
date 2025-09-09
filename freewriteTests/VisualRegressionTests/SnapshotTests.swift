@@ -10,62 +10,62 @@ struct SnapshotTests {
     
     @Test("NavigationBar maintains minimal aesthetic across states")
     func testNavigationBarVisualConsistency() async throws {
-        // Test different states of NavigationBar:
-        // - Timer running vs paused
-        // - Chat available vs not available  
-        // - Different font sizes
-        // - Hover states
-        // - Dark vs light mode
-        
-        // This would capture snapshots and compare against golden images
-        // ensuring visual consistency is maintained across changes
-        
-        let typographyState = TypographyStateManager()
-        let hoverState = HoverStateManager()
-        let uiState = UIStateManager()
-        let timer = FreewriteTimer()
-        let disclosureManager = ShortcutDisclosureManager()
-        
         // Test: Default state appearance
-        // [Snapshot would be captured here]
-        #expect(typographyState.fontSize == FontConstants.defaultSize)
+        let defaultNavBar = SnapshotTestHelper.createTestNavigationBar(timerRunning: false, fontSize: 18)
+        let defaultMatch = try SnapshotTestHelper.verifyLayout(
+            of: defaultNavBar,
+            named: "navigationbar-default",
+            size: CGSize(width: 600, height: 44)
+        )
+        #expect(defaultMatch == true)
         
-        // Test: Timer running state appearance  
-        timer.start()
-        // [Snapshot comparison would verify visual changes]
-        #expect(timer.isRunning == true)
+        // Test: Timer running state appearance
+        let runningNavBar = SnapshotTestHelper.createTestNavigationBar(timerRunning: true, fontSize: 18)
+        let runningMatch = try SnapshotTestHelper.verifyLayout(
+            of: runningNavBar,
+            named: "navigationbar-timer-running",
+            size: CGSize(width: 600, height: 44)
+        )
+        #expect(runningMatch == true)
         
-        // Test: Different typography state appearance
-        typographyState.updateFontSize(24)
-        // [Snapshot would verify font size changes render correctly]
-        #expect(typographyState.fontSize == 24)
+        // Test: Different typography size appearance
+        let largeNavBar = SnapshotTestHelper.createTestNavigationBar(timerRunning: false, fontSize: 24)
+        let largeMatch = try SnapshotTestHelper.verifyLayout(
+            of: largeNavBar,
+            named: "navigationbar-large-font",
+            size: CGSize(width: 600, height: 44)
+        )
+        #expect(largeMatch == true)
     }
     
     @Test("ContentView layout remains minimal across window sizes")
     func testContentViewResponsiveDesign() async throws {
-        // Test ContentView appearance at different window sizes:
-        // - Minimum window size (1100x600)
-        // - Maximum typical screen size
-        // - Different aspect ratios
-        // - Sidebar open vs closed
-        // - With vs without error overlays
+        // Test: Default layout at minimum size
+        let defaultContentView = SnapshotTestHelper.createTestContentView()
+        let defaultMatch = try SnapshotTestHelper.verifyLayout(
+            of: defaultContentView,
+            named: "contentview-default",
+            size: CGSize(width: 800, height: 600)
+        )
+        #expect(defaultMatch == true)
         
-        let uiState = UIStateManager()
+        // Test: Large window size
+        let largeContentView = SnapshotTestHelper.createTestContentView()
+        let largeMatch = try SnapshotTestHelper.verifyLayout(
+            of: largeContentView,
+            named: "contentview-large",
+            size: CGSize(width: 1400, height: 800)
+        )
+        #expect(largeMatch == true)
         
-        // Test: Default layout
-        #expect(uiState.showingSidebar == false)
-        #expect(uiState.bottomNavOpacity == 1.0)
-        
-        // Test: Sidebar visible layout
-        uiState.showingSidebar = true
-        // [Snapshot would verify sidebar layout doesn't break minimal design]
-        #expect(uiState.showingSidebar == true)
-        
-        // Test: Distraction-free mode
-        uiState.isDistractionFreeMode = true
-        uiState.bottomNavOpacity = 0.0
-        // [Snapshot would verify clean, distraction-free appearance]
-        #expect(uiState.bottomNavOpacity == 0.0)
+        // Test: Narrow aspect ratio
+        let narrowContentView = SnapshotTestHelper.createTestContentView()
+        let narrowMatch = try SnapshotTestHelper.verifyLayout(
+            of: narrowContentView,
+            named: "contentview-narrow",
+            size: CGSize(width: 600, height: 800)
+        )
+        #expect(narrowMatch == true)
     }
     
     @Test("Typography rendering maintains readability across font combinations")
@@ -122,38 +122,67 @@ struct SnapshotTests {
         let _ = FreewriteColors.timerRunning
         
         // Colors should be defined and accessible
-        #expect(true) // Placeholder for visual verification
+        // Test: Color accessibility verification
+        let colorTestView = VStack {
+            Text("Sample Text")
+                .foregroundColor(FreewriteColors.writingText)
+                .background(FreewriteColors.contentBackground)
+            Text("Navigation Text")
+                .foregroundColor(FreewriteColors.navigationText)
+            Text("Timer Running")
+                .foregroundColor(FreewriteColors.timerRunning)
+        }
+        .padding()
+        
+        let colorMatch = try SnapshotTestHelper.verifyLayout(
+            of: colorTestView,
+            named: "color-accessibility",
+            size: CGSize(width: 200, height: 150)
+        )
+        #expect(colorMatch == true)
     }
     
     @Test("Error and progress overlays maintain visual hierarchy")
     func testOverlayVisualConsistency() async throws {
-        // Test error and progress overlays:
-        // - Don't interfere with writing area
-        // - Maintain beautiful minimal appearance
-        // - Proper z-index and positioning
-        // - Appropriate shadows and materials
+        // Test: Progress overlay component
+        let progressView = ProgressOverlay(message: "Testing progress overlay", progress: 0.5)
+        let progressMatch = try SnapshotTestHelper.verifyLayout(
+            of: progressView,
+            named: "progress-overlay",
+            size: CGSize(width: 300, height: 100)
+        )
+        #expect(progressMatch == true)
         
+        // Test: Error overlay component  
+        let errorView = ErrorOverlay(
+            title: "Test Error",
+            message: "This is a test error message for visual regression testing",
+            onRetry: {},
+            onDismiss: {}
+        )
+        let errorMatch = try SnapshotTestHelper.verifyLayout(
+            of: errorView,
+            named: "error-overlay",
+            size: CGSize(width: 400, height: 200)
+        )
+        #expect(errorMatch == true)
+        
+        // Test state management integration
         let progressState = ProgressStateManager()
         let errorManager = ErrorManager()
         
-        // Test: Progress overlay appearance
         progressState.startLoading("Test message")
         #expect(progressState.isVisible == true)
-        #expect(!progressState.loadingMessage.isEmpty)
-        // [Snapshot would verify progress overlay design]
+        progressState.finishLoading()
         
-        // Test: Error overlay appearance
         let testError = UserError(
             title: "Test Error",
-            message: "Test error message for visual testing",
-            recoverySuggestion: "Test recovery suggestion",
+            message: "Test error message",
+            recoverySuggestion: "Test recovery",
             recoveryAction: {}
         )
         errorManager.reportError(testError)
         #expect(errorManager.currentError != nil)
-        // [Snapshot would verify error overlay design]
-        
-        progressState.finishLoading()
         errorManager.clearError()
     }
     
@@ -173,14 +202,37 @@ struct SnapshotTests {
         #expect(uiState.showingSidebar == false)
         uiState.showingSidebar = true
         #expect(uiState.showingSidebar == true)
-        // [Animation snapshots would verify smooth transitions]
+        // Test: UI state transitions render correctly
+        let sidebarClosedView = HStack {
+            Text("Main Content")
+                .frame(maxWidth: .infinity)
+            if uiState.showingSidebar {
+                Text("Sidebar")
+                    .frame(width: 200)
+            }
+        }
         
-        // Test: Hover state visual feedback
-        hoverState.isHoveringTimer = true
-        #expect(hoverState.isHoveringTimer == true)
-        hoverState.isHoveringTimer = false  
-        #expect(hoverState.isHoveringTimer == false)
-        // [Snapshots would verify hover feedback is subtle and beautiful]
+        let sidebarMatch = try SnapshotTestHelper.verifyLayout(
+            of: sidebarClosedView,
+            named: "sidebar-animation-state",
+            size: CGSize(width: 600, height: 200)
+        )
+        #expect(sidebarMatch == true)
+        
+        // Test: Hover state visual feedback components
+        let hoverTestView = VStack {
+            Button("Normal Button") {}
+            Button("Hovered Button") {}
+                .background(Color.blue.opacity(0.1))
+        }
+        .padding()
+        
+        let hoverMatch = try SnapshotTestHelper.verifyLayout(
+            of: hoverTestView,
+            named: "hover-state-feedback",
+            size: CGSize(width: 200, height: 100)
+        )
+        #expect(hoverMatch == true)
     }
 }
 
