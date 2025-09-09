@@ -11,7 +11,7 @@ final class UserPreferences {
     var defaultTimerDuration: Int = FreewriteConstants.defaultTimerDuration {
         didSet {
             // Validate timer bounds for methodology effectiveness
-            defaultTimerDuration = max(ProgressiveDisclosureConstants.defaultMinimumSessionLength, min(defaultTimerDuration, FreewriteConstants.maxTimerDuration))
+            // Note: Removed validation to prevent infinite loop - validation happens at usage points
         }
     }
     
@@ -25,7 +25,7 @@ final class UserPreferences {
     var backspaceGracePeriod: Double = ProgressiveDisclosureConstants.minBackspaceGracePeriod { // Seconds of backspace tolerance
         didSet {
             // Maintain freewriting methodology integrity
-            backspaceGracePeriod = max(ProgressiveDisclosureConstants.minBackspaceGracePeriod, min(backspaceGracePeriod, ProgressiveDisclosureConstants.maxBackspaceGracePeriod))
+            // Note: Removed validation to prevent infinite loop - validation happens at usage points
         }
     }
     var minimumSessionLength: Int = ProgressiveDisclosureConstants.defaultMinimumSessionLength // 5 minutes minimum for effectiveness
