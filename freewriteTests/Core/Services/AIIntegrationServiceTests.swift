@@ -22,7 +22,7 @@ struct AIIntegrationServiceTests {
     func testChatGPTURLGeneration() async throws {
         let service = createService()
         
-        let url = try service.generateChatGPTURL(content: shortContent, prompt: nil)
+        let url = try await service.generateChatGPTURL(content: shortContent, prompt: nil)
         
         #expect(url.scheme == "https")
         #expect(url.host == "chat.openai.com")
@@ -34,7 +34,7 @@ struct AIIntegrationServiceTests {
     func testClaudeURLGeneration() async throws {
         let service = createService()
         
-        let url = try service.generateClaudeURL(content: shortContent, prompt: nil)
+        let url = try await service.generateClaudeURL(content: shortContent, prompt: nil)
         
         #expect(url.scheme == "https")
         #expect(url.host == "claude.ai")
@@ -46,7 +46,7 @@ struct AIIntegrationServiceTests {
         let service = createService()
         let customPrompt = "Custom test prompt"
         
-        let url = try service.generateChatGPTURL(content: shortContent, prompt: customPrompt)
+        let url = try await service.generateChatGPTURL(content: shortContent, prompt: customPrompt)
         
         #expect(url.absoluteString.contains("Custom%20test%20prompt"))
     }
@@ -56,7 +56,7 @@ struct AIIntegrationServiceTests {
         let service = createService()
         let customPrompt = "Custom Claude prompt"
         
-        let url = try service.generateClaudeURL(content: shortContent, prompt: customPrompt)
+        let url = try await service.generateClaudeURL(content: shortContent, prompt: customPrompt)
         
         #expect(url.absoluteString.contains("Custom%20Claude%20prompt"))
     }
@@ -86,11 +86,11 @@ struct AIIntegrationServiceTests {
         let service = createService()
         
         await #expect(throws: FreewriteError.self) {
-            _ = try service.generateChatGPTURL(content: longContent, prompt: nil)
+            _ = try await service.generateChatGPTURL(content: longContent, prompt: nil)
         }
         
         await #expect(throws: FreewriteError.self) {
-            _ = try service.generateClaudeURL(content: longContent, prompt: nil)
+            _ = try await service.generateClaudeURL(content: longContent, prompt: nil)
         }
     }
     
@@ -190,7 +190,7 @@ struct AIIntegrationServiceTests {
         
         // Should handle gracefully or throw specific error
         await #expect(throws: FreewriteError.self) {
-            _ = try service.generateChatGPTURL(content: problematicContent, prompt: nil)
+            _ = try await service.generateChatGPTURL(content: problematicContent, prompt: nil)
         }
     }
     
@@ -205,8 +205,8 @@ struct AIIntegrationServiceTests {
         #expect(canShare == true)
         
         // 2. Generate URLs
-        let chatGPTURL = try service.generateChatGPTURL(content: shortContent, prompt: nil)
-        let claudeURL = try service.generateClaudeURL(content: shortContent, prompt: nil)
+        let chatGPTURL = try await service.generateChatGPTURL(content: shortContent, prompt: nil)
+        let claudeURL = try await service.generateClaudeURL(content: shortContent, prompt: nil)
         
         #expect(chatGPTURL.absoluteString.count > 0)
         #expect(claudeURL.absoluteString.count > 0)
@@ -231,8 +231,8 @@ struct AIIntegrationServiceTests {
         let startTime = Date()
         
         for _ in 0..<100 {
-            _ = try service.generateChatGPTURL(content: typicalContent, prompt: nil)
-            _ = try service.generateClaudeURL(content: typicalContent, prompt: nil)
+            _ = try await service.generateChatGPTURL(content: typicalContent, prompt: nil)
+            _ = try await service.generateClaudeURL(content: typicalContent, prompt: nil)
         }
         
         let elapsed = Date().timeIntervalSince(startTime)
