@@ -45,7 +45,7 @@ struct FileManagementServiceTests {
         
         let entry = try await service.createNewEntry()
         
-        #expect(entry.id != UUID.zero) // Valid UUID
+        #expect(entry.id.uuidString != "00000000-0000-0000-0000-000000000000") // Valid UUID
         #expect(!entry.filename.isEmpty)
         #expect(entry.filename.hasSuffix(".md"))
         #expect(entry.createdAt <= Date()) // Created in the past or now
