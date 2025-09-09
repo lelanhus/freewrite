@@ -56,7 +56,9 @@
 		E32BC8D4FECD15100DA47FA7 /* Lato-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 347C52F9AB41701D2A1C848B /* Lato-Light.ttf */; };
 		E3DE0287F6C01B867CFB7D8D /* Lato-Thin.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 129573019EF9A9DB6D56EE20 /* Lato-Thin.ttf */; };
 		E4D30B07BEDF2968966CD2DB /* DTOs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F0466EB82402087B49C8D74 /* DTOs.swift */; };
+		EC1FC9E3F48974AF8BF30E90 /* UserPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AE6E02A38AD60BC27389F3A /* UserPreferencesTests.swift */; };
 		EC2E6FE766115AA06F55C7F1 /* freewriteTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFC435D41326C9A4D20FDD5C /* freewriteTests.swift */; };
+		F29CAF342860BCEF898C0D63 /* KeyboardShortcutTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE4908BC32FF171EEBB5F87F /* KeyboardShortcutTests.swift */; };
 		F906E1A229CB7E1CF08BC12B /* KeyboardShortcutManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1064FF11A1816F6F1EC88071 /* KeyboardShortcutManager.swift */; };
 		FF09D0A48EBF3AA326EED601 /* ScrollableTimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F74AE4FDD163B3A90C11F892 /* ScrollableTimerView.swift */; };
 /* End PBXBuildFile section */
@@ -95,6 +97,7 @@
 		4A98C6B66F035C0530B93E63 /* FreewriteTimerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreewriteTimerTests.swift; sourceTree = "<group>"; };
 		4ADE7B9AAE1FB90597028C69 /* Lato-Black.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-Black.ttf"; sourceTree = "<group>"; };
 		4AE40DA70CD04C21BC3C8C01 /* AIIntegrationServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIIntegrationServiceProtocol.swift; sourceTree = "<group>"; };
+		4AE6E02A38AD60BC27389F3A /* UserPreferencesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserPreferencesTests.swift; sourceTree = "<group>"; };
 		4F0466EB82402087B49C8D74 /* DTOs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DTOs.swift; sourceTree = "<group>"; };
 		4FCCBFA180D73BDAA0A1B93E /* Lato-BlackItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-BlackItalic.ttf"; sourceTree = "<group>"; };
 		5BF2EAF5B8F49A8D7121BEB8 /* FreewriteUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FreewriteUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -135,6 +138,7 @@
 		F3602041168C35DF7E35D3B4 /* freewriteApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = freewriteApp.swift; sourceTree = "<group>"; };
 		F74AE4FDD163B3A90C11F892 /* ScrollableTimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollableTimerView.swift; sourceTree = "<group>"; };
 		FA2FE8BA310C1BFE8A198B5B /* ExportServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportServiceProtocol.swift; sourceTree = "<group>"; };
+		FE4908BC32FF171EEBB5F87F /* KeyboardShortcutTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardShortcutTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -454,6 +458,8 @@
 			isa = PBXGroup;
 			children = (
 				39E38BBD3D32E3448A834DA0 /* Services */,
+				FE4908BC32FF171EEBB5F87F /* KeyboardShortcutTests.swift */,
+				4AE6E02A38AD60BC27389F3A /* UserPreferencesTests.swift */,
 			);
 			path = Core;
 			sourceTree = "<group>";
@@ -686,8 +692,10 @@
 				069A5E8EE67F12C32AB84BBB /* FileManagementServiceTests.swift in Sources */,
 				6B3BD5CADC66EC26D84C23E3 /* FreewriteTimerTests.swift in Sources */,
 				65C792D6D6F222A9CD534A80 /* FreewritingWorkflowTests.swift in Sources */,
+				F29CAF342860BCEF898C0D63 /* KeyboardShortcutTests.swift in Sources */,
 				95C0625698C28373A5803AE0 /* SnapshotTests.swift in Sources */,
 				BF30784828BB40C0B9EF67DC /* UIComponentIntegrationTests.swift in Sources */,
+				EC1FC9E3F48974AF8BF30E90 /* UserPreferencesTests.swift in Sources */,
 				EC2E6FE766115AA06F55C7F1 /* freewriteTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
