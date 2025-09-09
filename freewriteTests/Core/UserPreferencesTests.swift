@@ -1,6 +1,6 @@
 import Testing
 import Foundation
-@testable import freewrite
+@testable import Freewrite
 
 /// Tests for user preferences system with minimal philosophy
 @MainActor

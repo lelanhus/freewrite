@@ -1,6 +1,6 @@
 import Testing
 import AppKit
-@testable import freewrite
+@testable import Freewrite
 
 /// Tests for keyboard shortcut system with freewriting constraint respect
 @MainActor
