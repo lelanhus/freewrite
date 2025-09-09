@@ -169,7 +169,7 @@ struct FreewritingWorkflowTests {
         // Test: Contextual tooltips
         let timerTooltip = disclosureManager.getTooltipFor(element: "timer")
         #expect(timerTooltip != nil)
-        #expect(timerTooltip?.shortcut == "⌘T")
+        #expect(timerTooltip?.contains("⌘T") == true)
     }
     
     // MARK: - Memory and Resource Management Integration

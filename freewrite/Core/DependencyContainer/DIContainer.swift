@@ -80,8 +80,9 @@ final class DIContainer: Sendable {
         services.register(
             AIIntegrationServiceProtocol.self,
             factory: { 
-                // For now, services don't throw, but this provides framework for future graceful degradation
-                return AIIntegrationService()
+                // Use lazy initialization for AI service - only loads when first used for export
+                LazyInitializationTracker.shared.recordServiceRegistration(serviceName: "AIIntegrationService")
+                return LazyAIIntegrationService()
             },
             singleton: true
         )

@@ -1,10 +1,21 @@
 import SwiftUI
 import Foundation
 
+// MARK: - Protocol
+
+/// Protocol for shortcut disclosure management
+@MainActor
+protocol ShortcutDisclosureManaging {
+    func registerSessionStart()
+    func registerShortcutUsed(_ shortcut: String)
+    func shouldShowTooltip(for shortcut: String) -> Bool
+    func getTooltipFor(element: String) -> String?
+}
+
 /// Progressive disclosure system for keyboard shortcuts - beautiful and minimal
 @MainActor
 @Observable
-final class ShortcutDisclosureManager {
+final class ShortcutDisclosureManager: ShortcutDisclosureManaging {
     
     // MARK: - User Proficiency Tracking
     
@@ -66,6 +77,10 @@ final class ShortcutDisclosureManager {
         case .expert:
             return true // Show all shortcuts for expert users
         }
+    }
+    
+    func getTooltipFor(element: String) -> String? {
+        return getTooltipFor(element: element, context: "")?.description
     }
     
     // MARK: - Shortcut Categories
