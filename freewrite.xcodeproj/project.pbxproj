@@ -24,6 +24,7 @@
 		4CFF7BC546E168A372BBB213 /* ErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65FEF6F8EF42BF77B7B2F656 /* ErrorHandling.swift */; };
 		556E5BBD49D5DFFEF8C8542E /* ShortcutDisclosureSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27256D11A76DB2818E0D81DB /* ShortcutDisclosureSystem.swift */; };
 		6052C9E6762D478418B980AD /* AIIntegrationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69295D906BBEFD2FE6773AF2 /* AIIntegrationService.swift */; };
+		65C792D6D6F222A9CD534A80 /* FreewritingWorkflowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C907753AA0A082FF936C1DD /* FreewritingWorkflowTests.swift */; };
 		6B3BD5CADC66EC26D84C23E3 /* FreewriteTimerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A98C6B66F035C0530B93E63 /* FreewriteTimerTests.swift */; };
 		74C2183235442328CEA34244 /* Lato-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7CE1C429577B25F2C145616E /* Lato-Italic.ttf */; };
 		7CD676B68DDA975B5158D93F /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEDCF616EE1F6993836D0BB8 /* ContentView.swift */; };
@@ -41,6 +42,7 @@
 		B5E93939515194CC946BA23B /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B941C40B51DD5C66A7F320DA /* Preview Assets.xcassets */; };
 		B8A1FA41CB18F78D40019A02 /* Sidebar.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA7CD69E5602F6DA1A2B09A7 /* Sidebar.swift */; };
 		BAF8A03C07890E9F9D6A4AD3 /* Lato-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4ADE7B9AAE1FB90597028C69 /* Lato-Black.ttf */; };
+		BF30784828BB40C0B9EF67DC /* UIComponentIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91A8C7EF580EA1834758D441 /* UIComponentIntegrationTests.swift */; };
 		C3BF0DB4D747FCDE5CDE05C3 /* Lato-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9B73308BD7D863955E7D7547 /* Lato-Bold.ttf */; };
 		C54DDBBF284C0983EDCEF7AF /* freewriteApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3602041168C35DF7E35D3B4 /* freewriteApp.swift */; };
 		C595C7384A49E9683561A6F2 /* default.md in Resources */ = {isa = PBXBuildFile; fileRef = 4061B5C6B4942F7513E06A53 /* default.md */; };
@@ -106,8 +108,10 @@
 		858B40DC2EF0739D4AF076D8 /* FileManagementServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileManagementServiceTests.swift; sourceTree = "<group>"; };
 		875F016C37F8E7BDCD41B92C /* FreewriteTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreewriteTimer.swift; sourceTree = "<group>"; };
 		87EA0B0E53A9285554C87559 /* OFL.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = OFL.txt; sourceTree = "<group>"; };
+		91A8C7EF580EA1834758D441 /* UIComponentIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIComponentIntegrationTests.swift; sourceTree = "<group>"; };
 		9230E1B84F9CB5723D08D396 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		9B73308BD7D863955E7D7547 /* Lato-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-Bold.ttf"; sourceTree = "<group>"; };
+		9C907753AA0A082FF936C1DD /* FreewritingWorkflowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreewritingWorkflowTests.swift; sourceTree = "<group>"; };
 		A5AB9FC47C088B4CFBB06208 /* freewrite.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = freewrite.entitlements; sourceTree = "<group>"; };
 		AFC435D41326C9A4D20FDD5C /* freewriteTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = freewriteTests.swift; sourceTree = "<group>"; };
 		B941C40B51DD5C66A7F320DA /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
@@ -247,6 +251,8 @@
 		545F94D26DC95BF4027C2B99 /* IntegrationTests */ = {
 			isa = PBXGroup;
 			children = (
+				9C907753AA0A082FF936C1DD /* FreewritingWorkflowTests.swift */,
+				91A8C7EF580EA1834758D441 /* UIComponentIntegrationTests.swift */,
 			);
 			path = IntegrationTests;
 			sourceTree = "<group>";
@@ -660,6 +666,8 @@
 				983499DC7EAB450A9C40A3BA /* AIIntegrationServiceTests.swift in Sources */,
 				069A5E8EE67F12C32AB84BBB /* FileManagementServiceTests.swift in Sources */,
 				6B3BD5CADC66EC26D84C23E3 /* FreewriteTimerTests.swift in Sources */,
+				65C792D6D6F222A9CD534A80 /* FreewritingWorkflowTests.swift in Sources */,
+				BF30784828BB40C0B9EF67DC /* UIComponentIntegrationTests.swift in Sources */,
 				EC2E6FE766115AA06F55C7F1 /* freewriteTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
