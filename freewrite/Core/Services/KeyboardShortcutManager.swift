@@ -51,13 +51,24 @@ final class KeyboardShortcutManager: @unchecked Sendable {
     }
     
     func updateTypingActivity() {
-        lastKeystrokeTime = Date()
+        let now = Date()
+        let timeSinceLastKeystroke = now.timeIntervalSince(lastKeystrokeTime)
+        
+        // Update last keystroke time
+        lastKeystrokeTime = now
         
         // Auto-detect flow state based on continuous typing
-        let timeSinceLastKeystroke = Date().timeIntervalSince(lastKeystrokeTime)
-        if timeSinceLastKeystroke < KeyboardShortcutConstants.typingContinuityThreshold && currentTypingState != .activeFlow {
-            // Continuous typing detected - likely entering flow
-            currentTypingState = .typing
+        if timeSinceLastKeystroke < KeyboardShortcutConstants.typingContinuityThreshold {
+            // Continuous typing detected
+            if currentTypingState == .idle {
+                currentTypingState = .typing
+            } else if currentTypingState == .typing && timeSinceLastKeystroke < 1.0 {
+                // Very rapid typing - entering deep flow
+                currentTypingState = .activeFlow
+            }
+        } else if timeSinceLastKeystroke > KeyboardShortcutConstants.flowStateThreshold {
+            // Long pause - return to idle
+            currentTypingState = .idle
         }
     }
     

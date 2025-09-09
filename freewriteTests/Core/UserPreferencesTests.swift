@@ -53,16 +53,19 @@ struct UserPreferencesTests {
     func testPreferencesValidation() async throws {
         let preferences = UserPreferences()
         
-        // Test: Timer bounds (validation removed to prevent infinite loop)
-        preferences.defaultTimerDuration = 2000 // Set to any value
-        #expect(preferences.defaultTimerDuration == 2000) // Should accept the value
+        // Test: Timer bounds validation (using safe validator)
+        preferences.defaultTimerDuration = 2000 // Set invalid value
+        preferences.applySafeValidation() // Apply safe validation
+        #expect(preferences.defaultTimerDuration == FreewriteConstants.maxTimerDuration) // Should be clamped
         
-        preferences.defaultTimerDuration = ProgressiveDisclosureConstants.defaultMinimumSessionLength // Set to valid minimum
-        #expect(preferences.defaultTimerDuration == ProgressiveDisclosureConstants.defaultMinimumSessionLength)
+        preferences.defaultTimerDuration = 60 // Set invalid value
+        preferences.applySafeValidation() // Apply safe validation
+        #expect(preferences.defaultTimerDuration == ProgressiveDisclosureConstants.defaultMinimumSessionLength) // Should be clamped
         
-        // Test: Backspace grace period (validation removed to prevent infinite loop)  
-        preferences.backspaceGracePeriod = ProgressiveDisclosureConstants.maxBackspaceGracePeriod
-        #expect(preferences.backspaceGracePeriod == ProgressiveDisclosureConstants.maxBackspaceGracePeriod)
+        // Test: Backspace grace period validation
+        preferences.backspaceGracePeriod = 10.0 // Set invalid value
+        preferences.applySafeValidation() // Apply safe validation
+        #expect(preferences.backspaceGracePeriod == ProgressiveDisclosureConstants.maxBackspaceGracePeriod) // Should be clamped
     }
     
     @Test("Settings access respects flow state")

@@ -169,6 +169,9 @@ final class UserPreferences {
     // MARK: - Persistence
     
     func save() {
+        // Validate values before saving
+        let validated = PreferencesValidator.getValidatedPreferences(self)
+        
         let defaults = UserDefaults.standard
         defaults.set(defaultTimerDuration, forKey: "defaultTimerDuration")
         defaults.set(autoStartTimer, forKey: "autoStartTimer")
@@ -208,11 +211,27 @@ final class UserPreferences {
         autoStartTimer = false
         timerSound = .subtleChime
         constraintLevel = .standard
-        backspaceGracePeriod = 0.0
+        backspaceGracePeriod = ProgressiveDisclosureConstants.minBackspaceGracePeriod
         analysisStyle = .friend
         autoOpenAnalysis = false
         privacyMode = false
         // Note: Don't reset sessionCount - preserve user experience level
+    }
+    
+    // MARK: - Validation API
+    
+    /// Validates all preference values and returns any validation errors
+    func validatePreferences() -> [String] {
+        return PreferencesValidator.validateAllPreferences(self)
+    }
+    
+    /// Applies safe validation to correct any out-of-bounds values
+    func applySafeValidation() {
+        let validated = PreferencesValidator.getValidatedPreferences(self)
+        defaultTimerDuration = validated.timerDuration
+        backspaceGracePeriod = validated.gracePeriod
+        minimumSessionLength = validated.minimumLength
+        sessionCount = validated.sessionCount
     }
     
     // MARK: - Initialization

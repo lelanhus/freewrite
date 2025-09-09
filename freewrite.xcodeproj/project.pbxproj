@@ -43,6 +43,7 @@
 		4CC7E84A5EC1373EFC46DD28 /* Lato-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DCF11E472E74AF5F610730E1 /* Lato-Regular.ttf */; };
 		4CFF7BC546E168A372BBB213 /* ErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65FEF6F8EF42BF77B7B2F656 /* ErrorHandling.swift */; };
 		4FF8D892F2F01D7013063354 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEDCF616EE1F6993836D0BB8 /* ContentView.swift */; };
+		504CE4A129E014ACFC30DD17 /* PreferencesValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D87F7D9E6947C35386F1F344 /* PreferencesValidator.swift */; };
 		50847729939ACAE52E3F1FA0 /* StateManagers.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDF7F78E5A076C9D0F12DAEA /* StateManagers.swift */; };
 		522064451F99A93553D6A78B /* TestOverlayComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7630D782E0E22309CBA0E4BC /* TestOverlayComponents.swift */; };
 		5290B72984C5069BDCC42273 /* MockAIIntegrationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B6E9DCE5C657EC8C4C9AE87 /* MockAIIntegrationService.swift */; };
@@ -55,6 +56,7 @@
 		65C792D6D6F222A9CD534A80 /* FreewritingWorkflowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C907753AA0A082FF936C1DD /* FreewritingWorkflowTests.swift */; };
 		6B3BD5CADC66EC26D84C23E3 /* FreewriteTimerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A98C6B66F035C0530B93E63 /* FreewriteTimerTests.swift */; };
 		74C2183235442328CEA34244 /* Lato-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7CE1C429577B25F2C145616E /* Lato-Italic.ttf */; };
+		77605E221ABC1B7619F2C050 /* PreferencesValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D87F7D9E6947C35386F1F344 /* PreferencesValidator.swift */; };
 		7CCCA37236C982ADDBDB88AF /* ColorStrategy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 751C0412F2E2CFF1B4568A47 /* ColorStrategy.swift */; };
 		7CD676B68DDA975B5158D93F /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEDCF616EE1F6993836D0BB8 /* ContentView.swift */; };
 		8955A33FE70B04A209AF9DF7 /* freewriteUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DBB6E003AEEBEE410824308 /* freewriteUITestsLaunchTests.swift */; };
@@ -182,6 +184,7 @@
 		C3A4B4B438DC6893C64FEC9A /* Lato-ThinItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-ThinItalic.ttf"; sourceTree = "<group>"; };
 		CA7CD69E5602F6DA1A2B09A7 /* Sidebar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sidebar.swift; sourceTree = "<group>"; };
 		D00AA8E8DF60DFC5624A18A4 /* LazyServiceWrappers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LazyServiceWrappers.swift; sourceTree = "<group>"; };
+		D87F7D9E6947C35386F1F344 /* PreferencesValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesValidator.swift; sourceTree = "<group>"; };
 		DCF11E472E74AF5F610730E1 /* Lato-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-Regular.ttf"; sourceTree = "<group>"; };
 		E2D64BE06A4D02F789E17CEE /* freewriteUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = freewriteUITests.swift; sourceTree = "<group>"; };
 		E6EF277EF381D8A79886DA5F /* ServiceRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceRegistry.swift; sourceTree = "<group>"; };
@@ -432,6 +435,7 @@
 				4F0466EB82402087B49C8D74 /* DTOs.swift */,
 				65FEF6F8EF42BF77B7B2F656 /* ErrorHandling.swift */,
 				E917E21732A96F8BECDA8D65 /* KeyboardShortcutConstants.swift */,
+				D87F7D9E6947C35386F1F344 /* PreferencesValidator.swift */,
 				27256D11A76DB2818E0D81DB /* ShortcutDisclosureSystem.swift */,
 				BDF7F78E5A076C9D0F12DAEA /* StateManagers.swift */,
 				8C1EFF61BC2B0C6C8CABB658 /* UserPreferences.swift */,
@@ -772,6 +776,7 @@
 				DD341D618D5B2A5BCFBDB3CF /* LazyServiceWrappers.swift in Sources */,
 				9F91F06B1C3E9F3E58637EA6 /* NavigationBar.swift in Sources */,
 				9AA4265D99627686E3D3693B /* PDFExportService.swift in Sources */,
+				504CE4A129E014ACFC30DD17 /* PreferencesValidator.swift in Sources */,
 				FF09D0A48EBF3AA326EED601 /* ScrollableTimerView.swift in Sources */,
 				1C59B187AE4A17750BE3EBD6 /* ServiceRegistry.swift in Sources */,
 				DEFBBAA40D8CC34DC9613FBD /* SettingsSheet.swift in Sources */,
@@ -818,6 +823,7 @@
 				D55ACCF4C6E83587B1911BD6 /* MockTimerService.swift in Sources */,
 				E122C34C53777F29A4CC1EC4 /* NavigationBar.swift in Sources */,
 				DF2F5628F2C915207E6F9897 /* PDFExportService.swift in Sources */,
+				77605E221ABC1B7619F2C050 /* PreferencesValidator.swift in Sources */,
 				982815B2D74B176C07F9D69F /* ScrollableTimerView.swift in Sources */,
 				A08FCB86A461F8D7574DABCC /* ServiceRegistry.swift in Sources */,
 				0EBD4F3E5DA2C251539FF347 /* SettingsSheet.swift in Sources */,
