@@ -18,6 +18,10 @@ struct ContentView: View {
     @State private var typographyState = TypographyStateManager()
     @State private var progressState = ProgressStateManager()
     @State private var errorManager = ErrorManager()
+    @State private var keyboardManager = KeyboardShortcutManager()
+    @State private var disclosureManager = ShortcutDisclosureManager()
+    @State private var userPreferences = UserPreferences()
+    @State private var showingSettings = false
     @State private var timerCancellable: AnyCancellable?
     @State private var fullscreenCancellables = Set<AnyCancellable>()
     
@@ -144,6 +148,7 @@ struct ContentView: View {
                         typographyState: typographyState,
                         hoverState: hoverState,
                         uiState: uiState,
+                        disclosureManager: disclosureManager,
                         text: $text,
                         timerService: timerService,
                         colorScheme: colorScheme,
@@ -193,12 +198,28 @@ struct ContentView: View {
                         await saveCurrentText()
                     }
                 )
+                .onAppear {
+                    // Load entries when sidebar first appears
+                    Task {
+                        await loadAllEntries()
+                    }
+                }
             }
         }
         .frame(minWidth: 1100, minHeight: 600)
         .animation(.easeInOut(duration: 0.2), value: uiState.showingSidebar)
         .preferredColorScheme(colorScheme)
         .background(FreewriteColors.contentBackground) // Ensure entire window uses system background
+        .sheet(isPresented: $showingSettings) {
+            SettingsSheet(
+                preferences: userPreferences,
+                isPresented: $showingSettings
+            )
+            .onDisappear {
+                // Save preferences when settings close
+                userPreferences.save()
+            }
+        }
         .onAppear {
             Task {
                 await setupInitialState()
@@ -206,15 +227,20 @@ struct ContentView: View {
             uiState.placeholderText = PlaceholderConstants.random()
             setupTimerSubscription()
             setupFullscreenSubscriptions()
+            setupKeyboardShortcuts()
             
             // Setup hover state coordination to prevent pollution
             uiState.notifyHoverStateReset = { [weak hoverState] in
                 hoverState?.resetAllHover()
             }
+            
+            // Register session start for shortcut learning
+            disclosureManager.registerSessionStart()
         }
         .onDisappear {
             cleanupTimerSubscription()
             cleanupFullscreenSubscriptions()
+            cleanupKeyboardMonitor()
             // Reset hover states on view disappear to prevent pollution
             hoverState.resetAllHover()
         }
@@ -353,6 +379,15 @@ struct ContentView: View {
         }
     }
     
+    private func loadAllEntries() async {
+        do {
+            entries = try await fileService.loadAllEntries()
+        } catch {
+            print("Failed to load entries: \(error)")
+            entries = []
+        }
+    }
+    
     private func getCurrentEntry() async -> WritingEntryDTO? {
         do {
             let entries = try await fileService.loadAllEntries()
@@ -401,7 +436,13 @@ struct ContentView: View {
         timerCancellable = Timer.publish(every: 1, on: .main, in: .common)
             .autoconnect()
             .sink { _ in
-                // Handle timer updates - make bottom nav disappear when timer is running
+                // Handle timer updates - respect distraction-free mode setting
+                if uiState.isDistractionFreeMode {
+                    // Distraction-free mode is manually controlled, don't change opacity
+                    return
+                }
+                
+                // Auto-hide nav when timer running (unless user is hovering or in distraction-free mode)
                 if timerService.isRunning && !hoverState.isHoveringBottomNav {
                     withAnimation(.easeIn(duration: 1.0)) {
                         uiState.bottomNavOpacity = 0.0
@@ -441,6 +482,90 @@ struct ContentView: View {
     
     private func cleanupFullscreenSubscriptions() {
         fullscreenCancellables.removeAll()
+    }
+    
+    // MARK: - Keyboard Shortcut Management
+    
+    @State private var keyboardMonitor: Any?
+    
+    private func setupKeyboardShortcuts() {
+        // Setup global keyboard monitoring for shortcuts with proper cleanup
+        keyboardMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak keyboardManager] event in
+            guard let manager = keyboardManager else { return event }
+            let handled = manager.handleKeyEvent(event)
+            return handled ? nil : event // Return nil if handled, event if not
+        }
+        
+        // Essential flow shortcuts
+        keyboardManager.onNewSession = {
+            Task { 
+                await createNewEntry()
+                // Reset timer for new session
+                timerService.reset()
+                timerService.start()
+            }
+            disclosureManager.registerShortcutUsed("⌘N")
+        }
+        
+        keyboardManager.onTimerToggle = {
+            if timerService.isRunning {
+                timerService.pause()
+            } else {
+                timerService.start()
+            }
+            disclosureManager.registerShortcutUsed("⌘T")
+        }
+        
+        keyboardManager.onToggleDistractionFree = {
+            // Toggle distraction-free mode state
+            uiState.isDistractionFreeMode.toggle()
+            
+            // Apply the visual changes
+            withAnimation(.easeInOut(duration: 0.3)) {
+                uiState.bottomNavOpacity = uiState.isDistractionFreeMode ? 0.0 : 1.0
+            }
+            disclosureManager.registerShortcutUsed("⌘D")
+        }
+        
+        keyboardManager.onTimerPreset = { minutes in
+            timerService.reset(to: minutes * 60) // Convert to seconds
+            disclosureManager.registerShortcutUsed("⌘\(minutes/5)")
+        }
+        
+        keyboardManager.onExportForAI = {
+            copyPromptToClipboard()
+            disclosureManager.registerShortcutUsed("⌘E")
+        }
+        
+        keyboardManager.onToggleSidebar = {
+            withAnimation(.easeInOut(duration: 0.2)) {
+                uiState.showingSidebar.toggle()
+            }
+            disclosureManager.registerShortcutUsed("⌘O")
+        }
+        
+        keyboardManager.onConstraintViolation = { message in
+            // Provide gentle feedback for blocked shortcuts
+            print("Shortcut blocked: \(message)")
+            // Could show subtle UI feedback here
+        }
+        
+        keyboardManager.onConstrainedPaste = {
+            // Handle paste with freewriting constraints
+            // Implementation would go here
+        }
+        
+        keyboardManager.onOpenSettings = {
+            showingSettings = true
+            disclosureManager.registerShortcutUsed("⌘,")
+        }
+    }
+    
+    private func cleanupKeyboardMonitor() {
+        if let monitor = keyboardMonitor {
+            NSEvent.removeMonitor(monitor)
+            keyboardMonitor = nil
+        }
     }
 }
 

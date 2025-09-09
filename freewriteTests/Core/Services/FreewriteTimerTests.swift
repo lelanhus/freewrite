@@ -194,7 +194,7 @@ struct FreewriteTimerTests {
         timer.start()
         
         // Simulate timer finishing
-        await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
+        try await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
         
         #expect(timer.isFinished == true)
         #expect(timer.isRunning == false)

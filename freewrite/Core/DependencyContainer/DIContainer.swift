@@ -80,7 +80,7 @@ final class DIContainer: Sendable {
         services.register(
             AIIntegrationServiceProtocol.self,
             factory: { 
-                // For now, services don't throw, but this provides framework for future graceful degradation
+                // Temporarily use direct service for startup debugging
                 return AIIntegrationService()
             },
             singleton: true

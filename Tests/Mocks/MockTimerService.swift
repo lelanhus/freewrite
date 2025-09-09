@@ -1,5 +1,5 @@
 import Foundation
-@testable import freewrite
+@testable import Freewrite
 
 @MainActor
 final class MockTimerService: @unchecked Sendable, TimerServiceProtocol {

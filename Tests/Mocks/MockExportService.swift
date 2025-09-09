@@ -1,5 +1,5 @@
 import Foundation
-@testable import freewrite
+@testable import Freewrite
 
 final class MockExportService: @unchecked Sendable, ExportServiceProtocol {
     func exportToPDF(entryId: UUID, settings: PDFExportSettings) async throws -> Data { 
