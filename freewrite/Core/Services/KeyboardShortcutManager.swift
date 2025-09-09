@@ -17,6 +17,12 @@ final class KeyboardShortcutManager: @unchecked Sendable {
     private var lastKeystrokeTime: Date = Date.distantPast
     private let flowStateThreshold: TimeInterval = 10.0 // 10 seconds of continuous typing = flow
     
+    // MARK: - Performance Monitoring
+    
+    private var keyEventProcessingTimes: [TimeInterval] = []
+    private let maxPerformanceSamples = 100 // Keep last 100 samples
+    private var performanceWarningThreshold: TimeInterval = 0.002 // 2ms threshold
+    
     // MARK: - Shortcut Action Handlers
     
     var onNewSession: (() -> Void)?
@@ -47,6 +53,12 @@ final class KeyboardShortcutManager: @unchecked Sendable {
     }
     
     func handleKeyEvent(_ event: NSEvent) -> Bool {
+        let startTime = CFAbsoluteTimeGetCurrent()
+        defer {
+            let processingTime = CFAbsoluteTimeGetCurrent() - startTime
+            recordPerformanceMetric(processingTime)
+        }
+        
         guard event.type == .keyDown else { return false }
         guard let characters = event.charactersIgnoringModifiers else { return false }
         
@@ -141,6 +153,34 @@ final class KeyboardShortcutManager: @unchecked Sendable {
     private func isEmergencyShortcut(_ key: String) -> Bool {
         // Emergency shortcuts that work even during flow state
         return ["d", "w", "q"].contains(key.lowercased())
+    }
+    
+    // MARK: - Performance Monitoring
+    
+    private func recordPerformanceMetric(_ processingTime: TimeInterval) {
+        keyEventProcessingTimes.append(processingTime)
+        
+        // Maintain sample size limit
+        if keyEventProcessingTimes.count > maxPerformanceSamples {
+            keyEventProcessingTimes.removeFirst()
+        }
+        
+        // Log warning if processing is slow (could interrupt typing flow)
+        if processingTime > performanceWarningThreshold {
+            print("⚠️ Keyboard event processing slow: \(String(format: "%.3f", processingTime * 1000))ms")
+        }
+    }
+    
+    func getPerformanceStats() -> (average: TimeInterval, max: TimeInterval, sampleCount: Int) {
+        guard !keyEventProcessingTimes.isEmpty else {
+            return (average: 0, max: 0, sampleCount: 0)
+        }
+        
+        let sum = keyEventProcessingTimes.reduce(0, +)
+        let average = sum / Double(keyEventProcessingTimes.count)
+        let max = keyEventProcessingTimes.max() ?? 0
+        
+        return (average: average, max: max, sampleCount: keyEventProcessingTimes.count)
     }
 }
 
