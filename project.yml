@@ -45,12 +45,16 @@ targets:
     platform: macOS
     sources:
       - path: freewriteTests
-    dependencies:
-      - target: Freewrite
+      - path: Tests
+      - path: freewrite
+        excludes:
+          - "freewriteApp.swift"
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: io.freewrite.tests
         GENERATE_INFOPLIST_FILE: YES
+        TEST_HOST: ""
+        BUNDLE_LOADER: ""
 
   FreewriteUITests:
     type: bundle.ui-testing

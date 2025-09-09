@@ -253,7 +253,7 @@ final class FileManagementService: FileManagementServiceProtocol {
             return cached
         }
         
-        // Simple, crash-safe directory resolution
+        // Normal app directory resolution
         let urls = fileManager.urls(for: .documentDirectory, in: .userDomainMask)
         let documentsURL = urls.first ?? FileManager.default.temporaryDirectory
         let directory = documentsURL.appendingPathComponent("Freewrite")

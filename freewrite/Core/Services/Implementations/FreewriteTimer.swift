@@ -9,13 +9,13 @@ final class FreewriteTimer: TimerServiceProtocol {
     private(set) var isFinished: Bool = false
     
     // Simple timer implementation without complex dispatch queues
-    nonisolated(unsafe) private var timer: Timer?
+    private var timer: Timer?
     
     init() {}
     
     deinit {
-        timer?.invalidate()
-        timer = nil
+        // Timer cleanup will be handled by the invalidate call
+        // Cannot access MainActor properties from nonisolated deinit
     }
     
     var formattedTime: String {

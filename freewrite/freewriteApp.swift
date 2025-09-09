@@ -8,9 +8,17 @@ struct FreewriteApp: App {
     
     init() {
         // Simple synchronous setup for fastest startup
-        registerFonts()
+        // Skip certain initialization steps when running in test environment
+        if !isRunningTests() {
+            registerFonts()
+        }
         DIContainer.shared.configure()
         _isConfigured = State(initialValue: true) // Start ready immediately
+    }
+    
+    /// Detects if we're running in a test environment
+    private func isRunningTests() -> Bool {
+        return NSClassFromString("XCTest") != nil
     }
     
     var body: some Scene {
@@ -45,6 +53,9 @@ struct FreewriteApp: App {
 // MARK: - App Delegate
 final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
+        // Skip window configuration in test environment
+        guard NSClassFromString("XCTest") == nil else { return }
+        
         Task { @MainActor in
             configureMainWindow()
         }
