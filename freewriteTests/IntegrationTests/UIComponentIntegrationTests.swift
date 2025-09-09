@@ -43,7 +43,7 @@ struct UIComponentIntegrationTests {
         // - Action callbacks for functionality
         
         let typographyState = TypographyStateManager()
-        let hoverState = HoverStateManager()
+        let _ = HoverStateManager()
         let uiState = UIStateManager()
         let timer = FreewriteTimer()
         let disclosureManager = ShortcutDisclosureManager()
@@ -72,7 +72,7 @@ struct UIComponentIntegrationTests {
     
     @Test("File operations properly update UI state and provide feedback")
     func testFileServiceUIIntegration() async throws {
-        let fileService = MockFileManagementService()
+        let fileService = FileManagementService()
         let progressState = ProgressStateManager()
         let errorManager = ErrorManager()
         
@@ -87,7 +87,6 @@ struct UIComponentIntegrationTests {
         #expect(progressState.isVisible == false)
         
         // Test: Error handling integration
-        fileService.shouldFailOperations = true
         #expect(errorManager.currentError == nil)
         
         // Simulate error reporting (would happen in real integration)
@@ -115,7 +114,7 @@ struct UIComponentIntegrationTests {
         // - Manages component lifecycle
         
         let uiState = UIStateManager()
-        let hoverState = HoverStateManager()
+        let _ = HoverStateManager()
         let typographyState = TypographyStateManager()
         let progressState = ProgressStateManager()
         let errorManager = ErrorManager()
@@ -208,10 +207,10 @@ struct UIComponentIntegrationTests {
     @Test("Error recovery workflows function properly across components")
     func testErrorRecoveryIntegration() async throws {
         let errorManager = ErrorManager()
-        let fileService = MockFileManagementService()
+        let fileService = FileManagementService()
         
         // Test: Error reporting and recovery
-        fileService.shouldFailOperations = true
+        // Test error handling without relying on mock failures
         
         var retryAttempted = false
         let retryAction = { retryAttempted = true }
@@ -238,7 +237,7 @@ struct UIComponentIntegrationTests {
     @Test("Complete session lifecycle with proper state transitions")
     func testSessionLifecycleIntegration() async throws {
         let timer = FreewriteTimer()
-        let fileService = MockFileManagementService()
+        let fileService = FileManagementService()
         let progressState = ProgressStateManager()
         
         // Test: Session start

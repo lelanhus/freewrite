@@ -3,6 +3,7 @@ import Foundation
 @testable import Freewrite
 
 /// Comprehensive tests for FileManagementService
+@MainActor
 struct FileManagementServiceTests {
     
     // MARK: - Setup & Teardown
