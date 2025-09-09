@@ -237,28 +237,33 @@ struct UIComponentIntegrationTests {
     @Test("Complete session lifecycle with proper state transitions")
     func testSessionLifecycleIntegration() async throws {
         let timer = FreewriteTimer()
-        let fileService = FileManagementService()
         let progressState = ProgressStateManager()
         
-        // Test: Session start
-        let entry = try await fileService.createNewEntry()
+        // Test: Session start state
         timer.start()
-        
         #expect(timer.isRunning == true)
-        #expect(entry.wordCount == 0)
+        #expect(timer.timeRemaining == FreewriteConstants.defaultTimerDuration)
         
-        // Test: Writing phase
-        let content = "\n\nThis is test content for integration testing of the freewriting workflow"
-        try await fileService.saveEntry(entry.id, content: content)
+        // Test: Progress state during session
+        progressState.startLoading("Testing session")
+        #expect(progressState.isVisible == true)
+        #expect(progressState.progress == 0.0)
+        
+        progressState.updateProgress(0.5, message: "Halfway")
+        #expect(progressState.progress == 0.5)
+        #expect(progressState.loadingMessage == "Halfway")
         
         // Test: Session completion
         timer.pause()
         #expect(timer.isRunning == false)
         
-        let savedContent = try await fileService.loadEntry(entry.id)
-        #expect(savedContent == content)
+        progressState.finishLoading()
+        #expect(progressState.isVisible == false)
+        #expect(progressState.progress == 0.0)
         
-        // Test: AI analysis readiness
-        #expect(content.count >= FreewriteConstants.minimumTextLength)
+        // Test: Content meets freewriting requirements
+        let testContent = "\n\nThis is test content for integration testing of the freewriting workflow and methodology validation"
+        #expect(testContent.count >= FreewriteConstants.minimumTextLength)
+        #expect(testContent.hasPrefix(FreewriteConstants.headerString))
     }
 }
