@@ -19,6 +19,7 @@
 		38AAFADFCB4A0CE0425CCF5B /* Lato-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1C190C743F912C6C03AF19F5 /* Lato-BoldItalic.ttf */; };
 		3A71502540B3B3A51C5A797D /* StateManagers.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDF7F78E5A076C9D0F12DAEA /* StateManagers.swift */; };
 		3D50860F25B38DA202850B87 /* FontControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C5898BAF4655E386AD1580B /* FontControls.swift */; };
+		3E479594B88A36EE7F5FB9F0 /* UserPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C1EFF61BC2B0C6C8CABB658 /* UserPreferences.swift */; };
 		40978D4D9636F15D69883052 /* OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = 87EA0B0E53A9285554C87559 /* OFL.txt */; };
 		4CC7E84A5EC1373EFC46DD28 /* Lato-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DCF11E472E74AF5F610730E1 /* Lato-Regular.ttf */; };
 		4CFF7BC546E168A372BBB213 /* ErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65FEF6F8EF42BF77B7B2F656 /* ErrorHandling.swift */; };
@@ -50,6 +51,7 @@
 		C843BC3514D5AAE7610E9E72 /* FileManagementService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 137C6730D72BD223A9825C92 /* FileManagementService.swift */; };
 		D4BDFBBB11D4627036CB9795 /* Lato-BlackItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4FCCBFA180D73BDAA0A1B93E /* Lato-BlackItalic.ttf */; };
 		D8A03913716E9BB9342EE7CA /* freewriteUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2D64BE06A4D02F789E17CEE /* freewriteUITests.swift */; };
+		DEFBBAA40D8CC34DC9613FBD /* SettingsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0B4D33DE8D0AFAF2F9922D /* SettingsSheet.swift */; };
 		DF6167F78B54ED956B1E3672 /* DIContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AA059BA6ABF7B6A39C7E82A /* DIContainer.swift */; };
 		E32BC8D4FECD15100DA47FA7 /* Lato-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 347C52F9AB41701D2A1C848B /* Lato-Light.ttf */; };
 		E3DE0287F6C01B867CFB7D8D /* Lato-Thin.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 129573019EF9A9DB6D56EE20 /* Lato-Thin.ttf */; };
@@ -110,6 +112,7 @@
 		858B40DC2EF0739D4AF076D8 /* FileManagementServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileManagementServiceTests.swift; sourceTree = "<group>"; };
 		875F016C37F8E7BDCD41B92C /* FreewriteTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreewriteTimer.swift; sourceTree = "<group>"; };
 		87EA0B0E53A9285554C87559 /* OFL.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = OFL.txt; sourceTree = "<group>"; };
+		8C1EFF61BC2B0C6C8CABB658 /* UserPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserPreferences.swift; sourceTree = "<group>"; };
 		91A8C7EF580EA1834758D441 /* UIComponentIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIComponentIntegrationTests.swift; sourceTree = "<group>"; };
 		9230E1B84F9CB5723D08D396 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		9B73308BD7D863955E7D7547 /* Lato-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-Bold.ttf"; sourceTree = "<group>"; };
@@ -117,6 +120,7 @@
 		A5AB9FC47C088B4CFBB06208 /* freewrite.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = freewrite.entitlements; sourceTree = "<group>"; };
 		AFC435D41326C9A4D20FDD5C /* freewriteTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = freewriteTests.swift; sourceTree = "<group>"; };
 		B941C40B51DD5C66A7F320DA /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		BB0B4D33DE8D0AFAF2F9922D /* SettingsSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsSheet.swift; sourceTree = "<group>"; };
 		BDF7F78E5A076C9D0F12DAEA /* StateManagers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StateManagers.swift; sourceTree = "<group>"; };
 		BFF35EA7FBE37DC8D5C577FF /* ConstrainedTextEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstrainedTextEditor.swift; sourceTree = "<group>"; };
 		C09265D9DDAFBA94379F65FD /* Lato-LightItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-LightItalic.ttf"; sourceTree = "<group>"; };
@@ -193,6 +197,7 @@
 				491FC192C28DBF1ED4D554F9 /* ChatMenu.swift */,
 				7C5898BAF4655E386AD1580B /* FontControls.swift */,
 				330EF686043D4852B071BDE4 /* NavigationBar.swift */,
+				BB0B4D33DE8D0AFAF2F9922D /* SettingsSheet.swift */,
 				CA7CD69E5602F6DA1A2B09A7 /* Sidebar.swift */,
 			);
 			path = Views;
@@ -360,6 +365,7 @@
 				65FEF6F8EF42BF77B7B2F656 /* ErrorHandling.swift */,
 				27256D11A76DB2818E0D81DB /* ShortcutDisclosureSystem.swift */,
 				BDF7F78E5A076C9D0F12DAEA /* StateManagers.swift */,
+				8C1EFF61BC2B0C6C8CABB658 /* UserPreferences.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -661,11 +667,13 @@
 				9AA4265D99627686E3D3693B /* PDFExportService.swift in Sources */,
 				FF09D0A48EBF3AA326EED601 /* ScrollableTimerView.swift in Sources */,
 				1C59B187AE4A17750BE3EBD6 /* ServiceRegistry.swift in Sources */,
+				DEFBBAA40D8CC34DC9613FBD /* SettingsSheet.swift in Sources */,
 				556E5BBD49D5DFFEF8C8542E /* ShortcutDisclosureSystem.swift in Sources */,
 				B8A1FA41CB18F78D40019A02 /* Sidebar.swift in Sources */,
 				3A71502540B3B3A51C5A797D /* StateManagers.swift in Sources */,
 				295EEF1E58DFCF4C1595720F /* TextConstraintValidator.swift in Sources */,
 				068B80F3EC89F84CAAB1966D /* TimerServiceProtocol.swift in Sources */,
+				3E479594B88A36EE7F5FB9F0 /* UserPreferences.swift in Sources */,
 				C54DDBBF284C0983EDCEF7AF /* freewriteApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

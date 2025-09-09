@@ -20,6 +20,8 @@ struct ContentView: View {
     @State private var errorManager = ErrorManager()
     @State private var keyboardManager = KeyboardShortcutManager()
     @State private var disclosureManager = ShortcutDisclosureManager()
+    @State private var userPreferences = UserPreferences()
+    @State private var showingSettings = false
     @State private var timerCancellable: AnyCancellable?
     @State private var fullscreenCancellables = Set<AnyCancellable>()
     
@@ -208,6 +210,16 @@ struct ContentView: View {
         .animation(.easeInOut(duration: 0.2), value: uiState.showingSidebar)
         .preferredColorScheme(colorScheme)
         .background(FreewriteColors.contentBackground) // Ensure entire window uses system background
+        .sheet(isPresented: $showingSettings) {
+            SettingsSheet(
+                preferences: userPreferences,
+                isPresented: $showingSettings
+            )
+            .onDisappear {
+                // Save preferences when settings close
+                userPreferences.save()
+            }
+        }
         .onAppear {
             Task {
                 await setupInitialState()
@@ -541,6 +553,11 @@ struct ContentView: View {
         keyboardManager.onConstrainedPaste = {
             // Handle paste with freewriting constraints
             // Implementation would go here
+        }
+        
+        keyboardManager.onOpenSettings = {
+            showingSettings = true
+            disclosureManager.registerShortcutUsed("⌘,")
         }
     }
     

@@ -27,6 +27,7 @@ final class KeyboardShortcutManager: @unchecked Sendable {
     var onConstrainedPaste: (() -> Void)?
     var onExportForAI: (() -> Void)?
     var onToggleSidebar: (() -> Void)?
+    var onOpenSettings: (() -> Void)?
     
     // MARK: - Public Interface
     
@@ -123,9 +124,14 @@ final class KeyboardShortcutManager: @unchecked Sendable {
             return false
             
         // MARK: System Shortcuts (Allow)
-        case "w", "q", "m", ",":
-            // Window, Quit, Minimize, Preferences - let system handle
+        case "w", "q", "m":
+            // Window, Quit, Minimize - let system handle
             return false
+            
+        case ",":
+            // Preferences - handle with our settings
+            onOpenSettings?()
+            return true
             
         default:
             return false
