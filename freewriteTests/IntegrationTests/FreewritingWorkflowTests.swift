@@ -1,5 +1,6 @@
 import Testing
 import Foundation
+import AppKit
 @testable import Freewrite
 
 /// Integration tests for complete freewriting workflows
@@ -10,9 +11,9 @@ struct FreewritingWorkflowTests {
     
     @Test("Complete freewriting session: new entry → write → timer → save → AI analysis")
     func testCompleteWritingSession() async throws {
-        // Setup services with mock dependencies
-        let fileService = MockFileManagementService()
-        let aiService = MockAIIntegrationService()
+        // Setup services - using real services for integration testing
+        let fileService = FileManagementService()
+        let aiService = AIIntegrationService()
         let timer = FreewriteTimer()
         
         // Test: Create new entry
@@ -48,7 +49,7 @@ struct FreewritingWorkflowTests {
     func testKeyboardShortcutIntegration() async throws {
         let keyboardManager = KeyboardShortcutManager()
         let timer = FreewriteTimer()
-        let fileService = MockFileManagementService()
+        let fileService = FileManagementService()
         
         // Test: ⌘T timer toggle integration
         var timerToggled = false
@@ -113,7 +114,7 @@ struct FreewritingWorkflowTests {
     
     @Test("File operations integrate properly with UI state and error handling")
     func testFileOperationIntegration() async throws {
-        let fileService = MockFileManagementService()
+        let fileService = FileManagementService()
         let errorManager = ErrorManager()
         
         // Test: Successful file operation

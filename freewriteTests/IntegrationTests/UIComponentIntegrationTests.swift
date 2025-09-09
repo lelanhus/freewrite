@@ -1,5 +1,6 @@
 import Testing
 import SwiftUI
+import AppKit
 @testable import Freewrite
 
 /// Integration tests for UI component interactions and state management
